@@ -69,8 +69,8 @@ async function sendEmail(env, to, subject, text, html) {
         body: JSON.stringify({ from: env.EMAIL_FROM || FROM, to: [to], subject, text, html }) });
       return r.ok;
     }
-    if (env.EMAIL && env.EMAIL.send) { await env.EMAIL.send({ to, from: env.EMAIL_FROM || 'hello@muirtech.net', subject, text, html }); return true; }
-  } catch (e) {}
+    if (env.EMAIL && env.EMAIL.send) { await env.EMAIL.send({ to, from: { email: 'hello@muirtech.net', name: 'MUIR Tech' }, replyTo: 'muirtechnh@gmail.com', subject, text, html }); return true; }
+  } catch (e) { console.log('email failed', e && (e.code || e.message)); }
   return false;
 }
 async function sendText(env, to, body) {

@@ -5,5 +5,6 @@
   "compatibility_date": "2026-11-18",
   "assets": { "directory": "./public", "binding": "ASSETS" },
   "ai": { "binding": "AI" },
+  "send_email": [ { "name": "EMAIL" } ],
   "d1_databases": [ { "binding": "DB", "database_name": "muir-tech-customers", "database_id": "ec7536d6-bd34-4d4d-b625-7d9e2dc7f105" } ]
 }
