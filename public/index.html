@@ -273,13 +273,19 @@ html:has(#theme option[value="light"]:checked) .nav a.l{color:var(--ink)}
 </div>
 </section>
 
-<section class="tips glass" aria-labelledby="tip-h">
+<style id="tips10">/* 10 tips, 6 s each */.tipbox .tip{animation:tipcycle10 60s infinite}.tipbox .tip:nth-child(1){animation-delay:0s}.tipbox .tip:nth-child(2){animation-delay:6s}.tipbox .tip:nth-child(3){animation-delay:12s}.tipbox .tip:nth-child(4){animation-delay:18s}.tipbox .tip:nth-child(5){animation-delay:24s}.tipbox .tip:nth-child(6){animation-delay:30s}.tipbox .tip:nth-child(7){animation-delay:36s}.tipbox .tip:nth-child(8){animation-delay:42s}.tipbox .tip:nth-child(9){animation-delay:48s}.tipbox .tip:nth-child(10){animation-delay:54s}@keyframes tipcycle10{0%{opacity:0;transform:translateY(10px)}1.6%,8.8%{opacity:1;transform:none}10.4%,100%{opacity:0}}</style><section class="tips glass" aria-labelledby="tip-h">
 <h2 id="tip-h"><span class="it"><span data-t="n47">Quick</span></span> <span data-t="n48">tech tips</span></h2>
 <div class="tipbox">
 <p class="tip"><span data-t="n49">Restart your router once a month. It clears most slow Wi-Fi.</span></p>
-<p class="tip"><span data-t="n50">If a link in a text or email feels off, don't tap it. Call me first.</span></p>
+<p class="tip"><span data-t="n50">If a link in a text or email feels off, don't tap it. Call us first.</span></p>
 <p class="tip"><span data-t="n51">Turn on automatic updates. They fix the holes scammers use.</span></p>
 <p class="tip"><span data-t="n52">Use a password manager. One strong password beats ten weak ones.</span></p>
+<p class="tip"><span data-t="n305">Back up your photos and files somewhere besides your computer.</span></p>
+<p class="tip"><span data-t="n306">Restart your computer once a week. It keeps things running smoothly.</span></p>
+<p class="tip"><span data-t="n307">Plug your computer, TV and router into a surge protector.</span></p>
+<p class="tip"><span data-t="n308">Keep computer vents clear of dust so it doesn't overheat.</span></p>
+<p class="tip"><span data-t="n309">Never let someone who calls out of the blue onto your computer.</span></p>
+<p class="tip"><span data-t="n310">Write down your Wi-Fi name and password and keep it somewhere safe.</span></p>
 </div>
 </section>
 
@@ -412,7 +418,7 @@ html:has(#theme option[value="light"]:checked) .nav a.l{color:var(--ink)}
 <a class="key k2" href="#contact"><span data-t="n127">Message</span></a>
 </div>
 </div>
-<script src="data.js?v=8"></script>
+<script src="data.js?v=9"></script>
 <script src="tabs.js?v=2"></script>
 <script src="app.js?v=4"></script>
 <script id="tipfit">(function(){function f(){var b=document.querySelector(".tipbox");if(!b)return;var m=0;b.querySelectorAll(".tip").forEach(function(p){var r=document.createRange();r.selectNodeContents(p);m=Math.max(m,r.getBoundingClientRect().height)});if(m)b.style.minHeight=Math.ceil(m+6)+"px"}addEventListener("load",f);addEventListener("resize",f);if(document.fonts)document.fonts.ready.then(f);setTimeout(f,1500)})()</script>
