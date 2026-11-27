@@ -5,3 +5,5 @@ Live at https://muirtech.net. Cloudflare Worker `proud-math-054a` (dmuirw@gmail.
 - `public/` the website itself (index.html, websites.html, data.js, app.js, tabs.js, assets, IMAGES)
 - `worker.js` serves the site and `/api/translate` (Spanish/Portuguese messages to English, Workers AI)
 - Pushing to `main` publishes the site.
+
+Live at https://muirtech.net. Pushing to main publishes the site (Cloudflare Worker proud-math-054a, connected 11-27-2026).
