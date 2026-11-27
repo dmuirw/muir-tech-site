@@ -1,0 +1,8 @@
+{
+  // MUIR Tech website (muirtech.net). Cloudflare rebuilds and publishes this on every push to main.
+  "name": "proud-math-054a",
+  "main": "worker.js",
+  "compatibility_date": "2026-11-18",
+  "assets": { "directory": "./public", "binding": "ASSETS" },
+  "ai": { "binding": "AI" }
+}
