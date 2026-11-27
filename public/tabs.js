@@ -31,12 +31,12 @@
   /* which parts of the page belong to each tab */
   var GROUPS=[
     {id:'home',key:'n300',label:'Home',parts:['#top','.mq','section.tips','section[aria-labelledby="ph-h"]','section[aria-labelledby="about-h"]']},
+    {id:'contact',key:'n4',label:'Contact',parts:['#contact']},
     {id:'services',key:'n1',label:'Services',parts:['#services','#access']},
     {id:'ai',key:'n2',label:'AI for business',parts:['#ai']},
     {id:'how',key:'n3',label:'How it works',parts:['#how']},
     {id:'websites',key:'n200',label:'Websites',href:'/websites'},
-    {id:'local',key:'n301',label:'Local businesses',parts:['#local']},
-    {id:'contact',key:'n4',label:'Contact',parts:['#contact']}
+    {id:'local',key:'n301',label:'Local businesses',parts:['#local']}
   ];
   var nav=q('header.nav');if(!nav)return;
   var onHome=!!q('#top');
