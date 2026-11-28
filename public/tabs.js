@@ -9,7 +9,7 @@
 
   var css=''+
   '.mtabs{width:100%;margin:4px 0 2px;padding:10px 0 14px;display:flex;flex-wrap:wrap;gap:16px 12px;justify-content:flex-start}.mtabs .mtab{flex:1 1 auto}'+
-  '@media (min-width:1000px){.mtabs .mtab{grid-row:2}.mtabs .mtab.mtab-login{grid-row:1;grid-column:8}.mtabs{display:grid;grid-template-columns:repeat(8,auto);justify-content:stretch}.mtabs .mtab{padding-left:4px;padding-right:4px}}'+
+  '@media (min-width:1000px){.mtabs.mtabs{grid-template-columns:repeat(8,minmax(0,1fr))!important;column-gap:8px}.mtabs .mtab{grid-row:2;min-width:0;font-size:clamp(11px,1.05vw,15px);letter-spacing:.05em;white-space:normal;text-align:center;line-height:1.1}.mtabs .mtab.mtab-login{grid-row:1;grid-column:8}.mtabs{display:grid;grid-template-columns:repeat(8,auto);justify-content:stretch}.mtabs .mtab{padding-left:4px;padding-right:4px}}'+
   /* glass keycap (design #5): the real Recraft keycap picture, stretched sideways to fit each word */
   '.mtab{position:relative;display:inline-flex;align-items:flex-start;justify-content:center;font-family:"MUIR Tech Display","Syne",sans-serif;font-weight:700;font-size:15px;letter-spacing:.08em;text-transform:uppercase;'+
    'color:#D9C68C;text-decoration:none;white-space:nowrap;cursor:pointer;height:74px;padding:0 26px;box-sizing:border-box;background:none;'+
