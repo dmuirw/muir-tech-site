@@ -213,7 +213,7 @@ html:has(#theme option[value="light"]:checked) .nav a.l{color:var(--ink)}
 <style id="chip1126">.stage .logo{display:none!important}.stage .hchip{width:min(480px,82vw);margin-top:0}@media (max-width:700px){.stage .hchip{width:min(320px,78vw);margin-top:10px}}</style>
 <style id="eb1126">#top .eyebrow{font-size:clamp(19px,3vw,28px)}</style>
 <style id="mtfont">@font-face{font-family:'MUIR Tech Display';src:url(/assets/MUIRTechDisplay-Regular.woff2) format('woff2');font-display:swap}h1,h2,h3,.key,.mtab,.eyebrow,.run,.st,summary,legend{font-synthesis:none}</style>
-</head>
+<style id="btn3d">.b3d{position:relative;display:inline-flex;align-items:flex-start;justify-content:center;font-family:"MUIR Tech Display","Syne",sans-serif;font-weight:700;font-size:15px;letter-spacing:.08em;text-transform:uppercase;color:#D9C68C;text-decoration:none;white-space:nowrap;cursor:pointer;height:74px;min-width:230px;padding:0 26px;box-sizing:border-box;background:none!important;box-shadow:none!important;border-style:solid;border-width:0 22px;border-color:transparent;border-image:url(/assets/keycap-btn.webp) 0 96 fill / 0 22px stretch;border-radius:0;text-shadow:0 1px 0 rgba(0,0,0,.8),0 0 10px rgba(195,175,117,.25);transition:transform .14s cubic-bezier(.3,.7,.4,1),filter .2s}.b3d>span{display:block;margin-top:13px;line-height:1.2}.b3d:hover{transform:translateY(5px) scaleY(.96);filter:brightness(1.12) drop-shadow(0 0 10px rgba(42,200,230,.45))}.b3d:active{transform:translateY(8px) scaleY(.92)}.b3d:focus-visible{outline:3px solid #C3AF75;outline-offset:5px}.b3d:disabled{opacity:.6;cursor:wait}@media (prefers-reduced-motion:reduce){.b3d{transition:none}.b3d:hover,.b3d:active{transform:none}}</style></head>
 <body>
 <div class="wrap">
 <a class="skip" href="#main"><span data-t="n0">Skip to main content</span></a>
@@ -292,7 +292,7 @@ html:has(#theme option[value="light"]:checked) .nav a.l{color:var(--ink)}
 <section id="ai" class="ai glass" aria-labelledby="ai-h">
 <div style="flex:1 1 400px;min-width:0">
 <p class="eyebrow"><span data-t="n54">New</span></p>
-<h2 id="ai-h" style="font-size:clamp(30px,4vw,52px);line-height:1.06;font-weight:800"><span data-t="n55">Put</span> <span class="it"><span data-t="n56">AI</span></span> <span data-t="n57">to work for your business.</span></h2>
+<h2 id="ai-h" style="font-size:clamp(30px,4vw,52px);line-height:1.06;font-weight:800"><span data-t="n55">Put</span> <span class="it"><span data-t="n56">AI</span></span> <span data-t="n57">to work for you or your business.</span></h2>
 <p style="color:var(--mut);margin:16px 0 26px;max-width:560px"><span data-t="n58">One-on-one lessons in plain English, at your pace. No experience needed.</span></p>
 <ul class="tags"><li><span data-t="n59">Logos and branding</span></li><li><span data-t="n60">Emails, quotes, ads and research</span></li><li><span data-t="n61">Connect AI to your computer</span></li><li><span data-t="n62">Gmail or Outlook, email and calendar</span></li><li><span data-t="n63">QuickBooks, spreadsheets, Google Workspace, Microsoft 365</span></li><li><span data-t="n64">Websites and social media</span></li><li><span data-t="n65">Automate the busywork</span></li><li><span data-t="n66">Privacy basics and staff training</span></li></ul>
 <div style="margin-top:30px"><a class="key k1" href="#contact"><span data-t="n67">Let's connect</span></a></div>
@@ -405,7 +405,7 @@ html:has(#theme option[value="light"]:checked) .nav a.l{color:var(--ink)}
 <p style="margin:0 0 8px;font-size:17px"><span data-t="n121">David will get this by email and text and get back to you.</span></p>
 <label for="hn"><span data-t="n102">Your name</span></label><input id="hn" type="text" autocomplete="name">
 <label for="hc"><span data-t="n103">Phone or email</span></label><input id="hc" type="text" autocomplete="email">
-<button type="button" class="key k1" id="hsend" style="margin-top:10px;padding:12px 18px;font-size:14px"><span data-t="n122">Send to David</span></button>
+<button type="button" class="b3d" id="hsend" style="margin-top:12px"><span data-t="n122">Send to us</span></button>
 <p role="alert" id="herr" hidden style="margin:8px 0 0;font-size:16px"><span data-t="n123">Please add your name and a phone number or email.</span></p>
 <div id="hlinks" class="hlinks" hidden></div>
 </div>
@@ -418,9 +418,9 @@ html:has(#theme option[value="light"]:checked) .nav a.l{color:var(--ink)}
 <a class="key k2" href="#contact"><span data-t="n127">Message</span></a>
 </div>
 </div>
-<script src="data.js?v=9"></script>
+<script src="data.js?v=10"></script>
 <script src="tabs.js?v=3"></script>
-<script src="app.js?v=5"></script>
+<script src="app.js?v=6"></script>
 <script id="tipfit">(function(){function f(){var b=document.querySelector(".tipbox");if(!b)return;var m=0;b.querySelectorAll(".tip").forEach(function(p){var r=document.createRange();r.selectNodeContents(p);m=Math.max(m,r.getBoundingClientRect().height)});if(m)b.style.minHeight=Math.ceil(m+6)+"px"}addEventListener("load",f);addEventListener("resize",f);if(document.fonts)document.fonts.ready.then(f);setTimeout(f,1500)})()</script>
 <style id="bintrail">.bt{position:fixed;left:0;top:0;pointer-events:none;z-index:9999;font:600 10px/1 ui-monospace,'SF Mono',Menlo,monospace;color:#C3AF75;text-shadow:0 0 8px rgba(195,175,117,.8);animation:btf .9s ease-out forwards;will-change:transform,opacity}.bt.b1{color:#7FD3EE;text-shadow:0 0 8px rgba(42,143,176,.9)}@keyframes btf{from{opacity:1;transform:translate(var(--x),var(--y)) scale(1)}to{opacity:0;transform:translate(var(--x),calc(var(--y) + 14px)) scale(.6)}}</style>
 <script id="bintrailjs">(function(){if(!matchMedia('(pointer:fine)').matches||matchMedia('(prefers-reduced-motion: reduce)').matches)return;var S='011001001011100101010001010100010010101011000',k=0,lx=-99,ly=-99;addEventListener('mousemove',function(e){var dx=e.clientX-lx,dy=e.clientY-ly;if(dx*dx+dy*dy<81)return;lx=e.clientX;ly=e.clientY;var c=S[k++%S.length],s=document.createElement('span');s.className='bt'+(c==='1'?' b1':'');s.textContent=c;s.setAttribute('aria-hidden','true');s.style.setProperty('--x',(e.clientX+6)+'px');s.style.setProperty('--y',(e.clientY+4)+'px');document.body.appendChild(s);setTimeout(function(){s.remove()},950)},{passive:true})})();</script>

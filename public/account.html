@@ -242,7 +242,7 @@ html:has(#theme option[value="light"]:checked) .nav a.l{color:var(--ink)}
 @media (max-width:800px){.whero{padding:56px 20px 20px}.start,.job{padding:24px;margin-left:0;margin-right:0}.job{grid-template-columns:1fr}.job textarea{min-height:240px}.why li{padding:24px}}
 </style>
 <style id="mtfont">@font-face{font-family:'MUIR Tech Display';src:url(/assets/MUIRTechDisplay-Regular.woff2) format('woff2');font-display:swap}h1,h2,h3,.key,.mtab,.eyebrow,.run,.st,summary,legend{font-synthesis:none}</style>
-</head>
+<style id="btn3d">.b3d{position:relative;display:inline-flex;align-items:flex-start;justify-content:center;font-family:"MUIR Tech Display","Syne",sans-serif;font-weight:700;font-size:15px;letter-spacing:.08em;text-transform:uppercase;color:#D9C68C;text-decoration:none;white-space:nowrap;cursor:pointer;height:74px;min-width:230px;padding:0 26px;box-sizing:border-box;background:none!important;box-shadow:none!important;border-style:solid;border-width:0 22px;border-color:transparent;border-image:url(/assets/keycap-btn.webp) 0 96 fill / 0 22px stretch;border-radius:0;text-shadow:0 1px 0 rgba(0,0,0,.8),0 0 10px rgba(195,175,117,.25);transition:transform .14s cubic-bezier(.3,.7,.4,1),filter .2s}.b3d>span{display:block;margin-top:13px;line-height:1.2}.b3d:hover{transform:translateY(5px) scaleY(.96);filter:brightness(1.12) drop-shadow(0 0 10px rgba(42,200,230,.45))}.b3d:active{transform:translateY(8px) scaleY(.92)}.b3d:focus-visible{outline:3px solid #C3AF75;outline-offset:5px}.b3d:disabled{opacity:.6;cursor:wait}@media (prefers-reduced-motion:reduce){.b3d{transition:none}.b3d:hover,.b3d:active{transform:none}}</style></head>
 <body>
 <div class="wrap">
 <a class="skip" href="#main">Skip to main content</a>
@@ -298,8 +298,8 @@ html:has(#theme option[value="light"]:checked) .nav a.l{color:var(--ink)}
 <div class="glass pane" style="max-width:520px">
 <div id="provs"></div>
 <p class="or" id="orTxt">or use your email</p>
-<form id="fEmail"><label for="em">Your email</label><input id="em" type="email" autocomplete="email" required placeholder="you@example.com"><div class="row"><button class="key k1" type="submit" id="bSend">Email me a code</button></div></form>
-<form id="fCode" hidden><p class="lead" style="margin:0">We sent a 6-digit code to <b id="emShow"></b>. Type it here.</p><label for="cd">6-digit code</label><input id="cd" class="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="123456"><div class="row"><button class="key k1" type="submit" id="bCode">Sign in</button><button class="back" type="button" id="bRe">Use a different email</button></div></form>
+<form id="fEmail"><label for="em">Your email</label><input id="em" type="email" autocomplete="email" required placeholder="you@example.com"><div class="row"><button class="b3d" type="submit" id="bSend"><span>Email me a code</span></button></div></form>
+<form id="fCode" hidden><p class="lead" style="margin:0">We sent a 6-digit code to <b id="emShow"></b>. Type it here.</p><label for="cd">6-digit code</label><input id="cd" class="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="123456"><div class="row"><button class="b3d" type="submit" id="bCode"><span>Sign in</span></button><button class="back" type="button" id="bRe">Use a different email</button></div></form>
 <p class="msg" id="inMsg" role="status" hidden></p>
 <p class="lead" style="font-size:15px;margin:16px 0 0">New here? Signing in makes your free account.</p>
 </div>
@@ -314,7 +314,7 @@ html:has(#theme option[value="light"]:checked) .nav a.l{color:var(--ink)}
 <section class="glass pane" aria-labelledby="hJobs"><h2 id="hJobs">Your jobs</h2><div class="grid" id="folders"></div></section>
 
 <section class="glass pane" aria-labelledby="hMsg"><h2 id="hMsg">Message MUIR Tech</h2><p class="lead" style="font-size:16px">For anything that isn't about one job. We usually answer the same day.</p><div class="thread" id="tMain"></div>
-<form id="fMain"><label for="mMain" class="sr">Your message</label><textarea id="mMain" placeholder="Type your message"></textarea><div class="row"><button class="key k1" type="submit">Send message</button></div><p class="msg" id="mainMsg" role="status" hidden></p></form></section>
+<form id="fMain"><label for="mMain" class="sr">Your message</label><textarea id="mMain" placeholder="Type your message"></textarea><div class="row"><button class="b3d" type="submit"><span>Send message</span></button></div><p class="msg" id="mainMsg" role="status" hidden></p></form></section>
 
 <section class="glass pane" aria-labelledby="hProf"><h2 id="hProf">Your details</h2>
 <form id="fProf"><div class="two"><div><label for="pName">Name</label><input id="pName" autocomplete="name"></div><div><label for="pPhone">Cell phone (for texts)</label><input id="pPhone" type="tel" autocomplete="tel" placeholder="(603) 555-0123"></div></div>
@@ -330,7 +330,7 @@ html:has(#theme option[value="light"]:checked) .nav a.l{color:var(--ink)}
 <form id="fNew" class="glass pane"><label for="nTitle">Give it a short name</label><input id="nTitle" maxlength="100" placeholder="Laptop won't start" required>
 <label for="nKind">What kind of job</label><select id="nKind"></select>
 <label for="nDet">Tell us what's going on</label><textarea id="nDet" maxlength="4000" placeholder="What happened, what you've noticed, and good times to reach you"></textarea>
-<div class="row"><button class="key k1" type="submit">Send to MUIR Tech</button></div><p class="msg" id="newMsg" role="status" hidden></p></form>
+<div class="row"><button class="b3d" type="submit"><span>Send to us</span></button></div><p class="msg" id="newMsg" role="status" hidden></p></form>
 </div>
 
 <div id="vJob" hidden>
@@ -340,7 +340,7 @@ html:has(#theme option[value="light"]:checked) .nav a.l{color:var(--ink)}
 <p><span class="st" id="jStatus"></span> <span class="empty" id="jDate"></span></p>
 <section class="glass pane"><h2>About this job</h2><p class="lead" id="jDet" style="white-space:pre-wrap;margin:0"></p></section>
 <section class="glass pane"><h2>Messages about this job</h2><div class="thread" id="tJob"></div>
-<form id="fJob"><label for="mJob" class="sr">Your message</label><textarea id="mJob" placeholder="Type your message about this job"></textarea><div class="row"><button class="key k1" type="submit">Send message</button></div><p class="msg" id="jobMsg" role="status" hidden></p></form></section>
+<form id="fJob"><label for="mJob" class="sr">Your message</label><textarea id="mJob" placeholder="Type your message about this job"></textarea><div class="row"><button class="b3d" type="submit"><span>Send message</span></button></div><p class="msg" id="jobMsg" role="status" hidden></p></form></section>
 </div>
 <p id="load" class="lead">Loading…</p>
 </main>

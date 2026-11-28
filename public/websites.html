@@ -241,7 +241,7 @@ html:has(#theme option[value="light"]:checked) .nav a.l{color:var(--ink)}
 @media (max-width:800px){.whero{padding:56px 20px 20px}.start,.job{padding:24px;margin-left:0;margin-right:0}.job{grid-template-columns:1fr}.job textarea{min-height:240px}.why li{padding:24px}}
 </style>
 <style id="mtfont">@font-face{font-family:'MUIR Tech Display';src:url(/assets/MUIRTechDisplay-Regular.woff2) format('woff2');font-display:swap}h1,h2,h3,.key,.mtab,.eyebrow,.run,.st,summary,legend{font-synthesis:none}</style>
-</head>
+<style id="btn3d">.b3d{position:relative;display:inline-flex;align-items:flex-start;justify-content:center;font-family:"MUIR Tech Display","Syne",sans-serif;font-weight:700;font-size:15px;letter-spacing:.08em;text-transform:uppercase;color:#D9C68C;text-decoration:none;white-space:nowrap;cursor:pointer;height:74px;min-width:230px;padding:0 26px;box-sizing:border-box;background:none!important;box-shadow:none!important;border-style:solid;border-width:0 22px;border-color:transparent;border-image:url(/assets/keycap-btn.webp) 0 96 fill / 0 22px stretch;border-radius:0;text-shadow:0 1px 0 rgba(0,0,0,.8),0 0 10px rgba(195,175,117,.25);transition:transform .14s cubic-bezier(.3,.7,.4,1),filter .2s}.b3d>span{display:block;margin-top:13px;line-height:1.2}.b3d:hover{transform:translateY(5px) scaleY(.96);filter:brightness(1.12) drop-shadow(0 0 10px rgba(42,200,230,.45))}.b3d:active{transform:translateY(8px) scaleY(.92)}.b3d:focus-visible{outline:3px solid #C3AF75;outline-offset:5px}.b3d:disabled{opacity:.6;cursor:wait}@media (prefers-reduced-motion:reduce){.b3d{transition:none}.b3d:hover,.b3d:active{transform:none}}</style></head>
 <body>
 <div class="wrap">
 <a class="skip" href="#main">Skip to main content</a>
@@ -328,7 +328,7 @@ html:has(#theme option[value="light"]:checked) .nav a.l{color:var(--ink)}
 <textarea id="wm" spellcheck="true" autocapitalize="sentences" placeholder="For example: I run a landscaping business. My site is old, slow on phones and doesn't show my best work. I'd like a gallery and a quote form."></textarea>
 </div>
 <div class="send">
-<button class="key k1" type="button" id="wsend">Send to David</button>
+<button class="b3d" type="button" id="wsend"><span>Send to us</span></button>
 <p class="err" id="werr" role="alert" hidden>Please add your name and a phone number or email.</p>
 <p id="wok" hidden style="margin:0;font-size:19px">Thanks! Tap a button to send it by text or email.</p>
 <div class="sendout" id="wout" hidden><a class="key k1" id="wtext" href="#">Text David</a><a class="key k2" id="wmail" href="#">Email David</a></div>
