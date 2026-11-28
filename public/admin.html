@@ -246,7 +246,10 @@ html:has(#theme option[value="light"]:checked) .nav a.l{color:var(--ink)}
 .adm table.qt{width:100%;border-collapse:collapse}.adm .qt th{text-align:left;font-size:14px;color:var(--mut);padding:4px}.adm .qt td{padding:3px;vertical-align:top}.adm .qt td:nth-child(2),.adm .qt td:nth-child(3){width:120px}.adm .qt textarea{min-height:44px;resize:vertical}
 .adm .qt .rm{background:none;border:1px solid rgba(255,255,255,.3);color:var(--ink);border-radius:8px;width:38px;height:42px;cursor:pointer;font-size:16px}
 .adm .qtot{margin:10px 0 0 auto;max-width:380px}.adm .qtot p{display:flex;justify-content:space-between;margin:4px 0;font-size:17px}.adm .qtot p.big{font-size:21px;border-top:1px solid var(--gold);padding-top:6px}
-.adm .gatef{max-width:460px}@media(max-width:700px){.adm .qt td:nth-child(2),.adm .qt td:nth-child(3){width:86px}}</style></head>
+.adm .gatef{max-width:460px}@media(max-width:700px){.adm .qt td:nth-child(2),.adm .qt td:nth-child(3){width:86px}}</style><style id="pbcss">.adm .qt textarea{min-height:46px;resize:vertical;overflow:hidden;line-height:1.4}
+.adm .qt .rm{width:auto!important;padding:0 12px;white-space:nowrap;font-size:14px!important}
+.adm .pbt td:nth-child(1){width:170px}.adm .pbt td:nth-child(2){width:auto}.adm .pbt td:nth-child(3),.adm .pbt td:nth-child(4){width:120px}.adm .pbt td:nth-child(5){width:110px}
+@media(max-width:800px){.adm .pbt,.adm .pbt tbody,.adm .pbt tr,.adm .pbt td{display:block;width:auto!important}.adm .pbt thead{display:none}.adm .pbt tr{border:1px solid rgba(255,255,255,.2);border-radius:10px;padding:8px;margin:0 0 10px}}</style></head>
 <body>
 <div class="wrap">
 <a class="skip" href="#main">Skip to main content</a>
@@ -341,6 +344,7 @@ function thread(list){var t=el('div','thread');if(!list.length)t.appendChild(el(
 function replyBox(email,pid){var f=el('form');var ta=el('textarea');ta.placeholder='Reply (they get an email or text)';ta.setAttribute('aria-label','Reply');var r=el('div','row');var b=el('button','key k1','Send reply');b.type='submit';r.appendChild(b);var m=el('p','msg');m.hidden=true;f.appendChild(ta);f.appendChild(r);f.appendChild(m);
  f.onsubmit=function(e){e.preventDefault();if(!ta.value.trim())return;b.disabled=true;api('/api/admin/message',{email:email,projectId:pid,body:ta.value}).then(function(x){b.disabled=false;if(!x.ok){m.hidden=false;m.className='msg bad';m.textContent=x.error;return}load(email)})};return f}
 var PB=[],QS={};
+function grow(t){function f(){t.style.height='auto';t.style.height=Math.max(46,t.scrollHeight+2)+'px'}t.addEventListener('input',f);setTimeout(f,0)}
 function pnum(id){return 'MT-'+(1000+Number(id))}
 function money(v){var n=Math.round(parseFloat(String(v).replace(/[^0-9.\-]/g,''))*100)/100;return isFinite(n)?n:0}
 function fmt(n){return '$'+money(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}
@@ -353,10 +357,10 @@ function quoteBox(j){var q=QS[j.id]||{lines:'[]',status:'draft',notes:''};var li
  var tb=el('table','qt');tb.innerHTML='<thead><tr><th>Description</th><th>Materials</th><th>Labor</th><th aria-label="Remove"></th></tr></thead>';var body=el('tbody');tb.appendChild(body);box.appendChild(tb);
  var tot=el('div','qtot');
  function sum(){var m=0,l=0;[].forEach.call(body.querySelectorAll('tr'),function(r){m+=money(r.querySelector('.m').value);l+=money(r.querySelector('.l').value)});tot.innerHTML='';[['Total materials (tax included)',m],['Total labor',l],['Total job',m+l]].forEach(function(x,i){var p=el('p',i===2?'big':'');p.appendChild(el('span','',x[0]));p.appendChild(el('b','',fmt(x[1])));tot.appendChild(p)})}
- function row(x){var r=el('tr');var c1=el('td'),d=el('textarea','d');d.rows=1;d.value=x.desc||'';d.setAttribute('aria-label','Description');c1.appendChild(d);
+ function row(x){var r=el('tr');var c1=el('td'),d=el('textarea','d');d.rows=1;d.value=x.desc||'';grow(d);d.setAttribute('aria-label','Description');c1.appendChild(d);
   var c2=el('td'),m=el('input','m');m.inputMode='decimal';m.value=x.m?money(x.m).toFixed(2):'';m.placeholder='0.00';m.setAttribute('aria-label','Materials');c2.appendChild(m);
   var c3=el('td'),l=el('input','l');l.inputMode='decimal';l.value=x.l?money(x.l).toFixed(2):'';l.placeholder='0.00';l.setAttribute('aria-label','Labor');c3.appendChild(l);
-  var c4=el('td'),x2=el('button','rm','✕');x2.type='button';x2.title='Remove line';x2.onclick=function(){r.remove();sum()};c4.appendChild(x2);
+  var c4=el('td'),x2=el('button','rm','− Remove');x2.type='button';x2.title='Remove this line';x2.onclick=function(){r.remove();sum()};c4.appendChild(x2);
   [m,l].forEach(function(i){i.oninput=sum;i.onblur=function(){if(i.value)i.value=money(i.value).toFixed(2)}});
   r.appendChild(c1);r.appendChild(c2);r.appendChild(c3);r.appendChild(c4);body.appendChild(r)}
  lines.forEach(row);if(!lines.length)row({});
@@ -375,8 +379,8 @@ function quoteBox(j){var q=QS[j.id]||{lines:'[]',status:'draft',notes:''};var li
  var r3=el('div','row');[['Download QuickBooks invoice (.csv)','invoice'],['Download as estimate (.csv)','estimate']].forEach(function(x){var a=el('a','key k2',x[0]);a.href='/api/admin/export?type='+x[1]+'&id='+j.id;r3.appendChild(a)});box.appendChild(r3);box.appendChild(msg);
  sum();return box}
 function pbEditor(){var p=el('div','glass pane');p.appendChild(el('h2','','Price book'));p.appendChild(el('p','muted','Your standard items and prices. New quote requests are filled in from these, and you can add any of them to a quote. Taxes go in the materials price.'));
- var tb=el('table','qt');tb.innerHTML='<thead><tr><th>Group</th><th>Description</th><th>Materials</th><th>Labor</th><th></th></tr></thead>';var body=el('tbody');tb.appendChild(body);p.appendChild(tb);
- function row(x){var r=el('tr');r.dataset.key=x.key||'';[['g',x.group||'General'],['d',x.desc||''],['m',x.m?money(x.m).toFixed(2):''],['l',x.l?money(x.l).toFixed(2):'']].forEach(function(c){var td=el('td'),i=el('input',c[0]);i.value=c[1];if(c[0]==='m'||c[0]==='l'){i.inputMode='decimal';i.placeholder='0.00'}td.appendChild(i);r.appendChild(td)});var td=el('td'),b=el('button','rm','✕');b.type='button';b.onclick=function(){r.remove()};td.appendChild(b);r.appendChild(td);body.appendChild(r)}
+ var tb=el('table','qt pbt');tb.innerHTML='<thead><tr><th>Group</th><th>Description</th><th>Materials</th><th>Labor</th><th></th></tr></thead>';var body=el('tbody');tb.appendChild(body);p.appendChild(tb);
+ function row(x){var r=el('tr');r.dataset.key=x.key||'';[['g',x.group||'General'],['d',x.desc||''],['m',x.m?money(x.m).toFixed(2):''],['l',x.l?money(x.l).toFixed(2):'']].forEach(function(c){var td=el('td'),i=el(c[0]==='d'?'textarea':'input',c[0]);if(c[0]==='d'){i.rows=1;grow(i)}i.value=c[1];if(c[0]==='m'||c[0]==='l'){i.inputMode='decimal';i.placeholder='0.00'}td.appendChild(i);r.appendChild(td)});var td=el('td'),b=el('button','rm','− Remove');b.type='button';b.title='Remove this item';b.onclick=function(){r.remove()};td.appendChild(b);r.appendChild(td);body.appendChild(r)}
  PB.forEach(row);var rw=el('div','row');var a=el('button','key k2','+ Add item');a.type='button';a.onclick=function(){row({})};var s=el('button','key k1','Save price book');s.type='button';var m=el('p','msg');m.hidden=true;
  s.onclick=function(){var items=[].map.call(body.querySelectorAll('tr'),function(r){return{key:r.dataset.key,group:r.querySelector('.g').value,desc:r.querySelector('.d').value,m:r.querySelector('.m').value,l:r.querySelector('.l').value}});api('/api/admin/pricebook',{items:items}).then(function(x){m.hidden=false;m.className='msg '+(x.ok?'good':'bad');m.textContent=x.ok?'Saved.':x.error;if(x.ok)load(cur)})};
  rw.appendChild(a);rw.appendChild(s);p.appendChild(rw);p.appendChild(m);
