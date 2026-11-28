@@ -64,7 +64,7 @@
   nav.appendChild(bar);
   /* 11-27-2026: call, screen color and language sit in the empty top row, left of Security cameras (wide screens) */
   (function(){var ctl=nav.querySelector(':scope > div:not(.mtabs)');if(!ctl||!ctl.querySelector('.langs'))return;ctl.classList.add('hdrctl');var mq=matchMedia('(min-width:1000px)');
-    function place(){if(mq.matches){if(ctl.parentNode!==bar)bar.insertBefore(ctl,bar.firstChild)}else if(ctl.parentNode===bar){nav.insertBefore(ctl,bar)}}
+    function place(){if(mq.matches){if(ctl.parentNode!==bar)bar.insertBefore(ctl,bar.firstChild);ctl.style.cssText='display:flex;flex-wrap:nowrap;gap:12px;align-items:center;grid-row:1;grid-column:1/5;align-self:center;width:auto'}else if(ctl.parentNode===bar){nav.insertBefore(ctl,bar);ctl.style.cssText='display:flex;flex-wrap:wrap;gap:8px 22px;align-items:center;width:100%'}}
     place();mq.addEventListener?mq.addEventListener('change',place):mq.addListener(place);})();
 
   function els(g){var out=[];(g.parts||[]).forEach(function(s){document.querySelectorAll(s).forEach(function(e){out.push(e)})});return out}
