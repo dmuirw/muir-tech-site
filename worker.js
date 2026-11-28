@@ -311,6 +311,27 @@ export default {
         return Response.json({ ok: true, text: (r && r.translated_text) || text });
       } catch (e) { return Response.json({ ok: false, error: 'translate failed' }, { status: 500 }); }
     }
+    if (path === '/api/contact') {
+      if (req.method !== 'POST') return new Response('Method not allowed', { status: 405 });
+      try {
+        const b = await req.json().catch(() => ({}));
+        if (b.website) return Response.json({ ok: true });
+        const name = String(b.name || '').slice(0, 120).trim(), contact = String(b.contact || '').slice(0, 160).trim();
+        const topic = String(b.topic || '').slice(0, 120), msg = String(b.message || '').slice(0, 4000).trim();
+        if (!msg && !contact) return Response.json({ ok: false, error: 'Please add a message and how to reach you.' }, { status: 400 });
+        if (env.DB) {
+          await ensure(env); const ip = await sha('ip|' + ipOf(req)), now = Date.now();
+          const n = await env.DB.prepare("SELECT COUNT(*) c FROM sends WHERE ip=? AND email='contact' AND t>?").bind(ip, now - 3600e3).first();
+          if (n && n.c >= 8) return Response.json({ ok: false, error: 'Too many messages. Please call or text (603) 600-2843.' }, { status: 429 });
+          await env.DB.prepare("INSERT INTO sends (email, ip, t) VALUES ('contact', ?, ?)").bind(ip, now).run();
+        }
+        const text = 'New message from the MUIR Tech website\n\nName: ' + (name || '-') + '\nPhone or email: ' + (contact || '-') + '\nTopic: ' + (topic || '-') + '\n\n' + (msg || '(no message)');
+        const to = env.OWNER_EMAIL || 'muirtechnh@gmail.com';
+        const ok = await sendEmail(env, to, 'Website message' + (name ? ' from ' + name : ''), text, '<pre style="font:15px/1.5 system-ui,sans-serif;white-space:pre-wrap">' + esc(text) + '</pre>');
+        if (!ok) return Response.json({ ok: false, error: 'Email is not going through right now. Please call or text (603) 600-2843.' }, { status: 502 });
+        return Response.json({ ok: true });
+      } catch (e) { return Response.json({ ok: false, error: 'Something went wrong. Please call or text (603) 600-2843.' }, { status: 500 }); }
+    }
     if (path.startsWith('/api/auth') || path.startsWith('/api/portal') || path.startsWith('/api/admin')) {
       if (!env.DB) return bad('Customer accounts are being set up. Please call or email us for now.', 503);
       try {

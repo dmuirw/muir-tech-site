@@ -55,13 +55,17 @@ if(ta){ta.addEventListener('input',function(){
 var sendBtn=$('#sendmsg');
 if(sendBtn)sendBtn.addEventListener('click',function(){
   var name=($('#n')||{}).value||'',contact=($('#c')||{}).value||'',topic=($('#t')||{}).value||'',msg=(ta||{}).value||'';
-  sendBtn.disabled=true;
+  var st=$('#sendst');if(!st){st=document.createElement('p');st.id='sendst';st.setAttribute('role','status');st.style.cssText='margin:10px 0 0;font-size:18px';sendBtn.parentNode.insertBefore(st,sendBtn.nextSibling);}
+  if(!msg.trim()||!contact.trim()){st.style.color='#F2B8A2';st.textContent='Please add your phone or email and a short message.';return;}
+  sendBtn.disabled=true;st.style.color='';st.textContent='Sending...';
   Promise.all([toEnglish(topic),toEnglish(msg)]).then(function(r){
-    var body='Name: '+name+'\nPhone or email: '+contact+'\nTopic: '+r[0]+'\n\n'+r[1];
-    if(lang!=='en'&&msg.trim())body+='\n\n--- Original ('+LNAME[lang]+') ---\n'+msg;
+    var m=r[1];if(lang!=='en'&&msg.trim())m+='\n\n--- Original ('+LNAME[lang]+') ---\n'+msg;
+    return fetch('/api/contact',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({name:name,contact:contact,topic:r[0],message:m})}).then(function(x){return x.json()});
+  }).then(function(j){
     sendBtn.disabled=false;
-    location.href='mailto:muirtechnh@gmail.com?subject='+encodeURIComponent('MUIR Tech website message'+(name?' from '+name:''))+'&body='+encodeURIComponent(body);
-  });
+    if(j&&j.ok){st.style.color='var(--gold)';st.textContent='Thanks! Your message was sent. We will get back to you soon.';if(ta)ta.value='';}
+    else{st.style.color='#F2B8A2';st.textContent=(j&&j.error)||'It did not send. Please call or text (603) 600-2843.';}
+  }).catch(function(){sendBtn.disabled=false;st.style.color='#F2B8A2';st.textContent='It did not send. Please call or text (603) 600-2843.';});
 });
 /* ---------- chat helper ---------- */
 var chat=[{cls:'bot',text:UI[lang].hi}],log=$('#chatlog'),qIn=$('#aq');
