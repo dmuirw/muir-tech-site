@@ -3,7 +3,7 @@
 (function(){
   /* words for the new tabs in all three languages (app.js swaps them when the language changes) */
   try{
-    var W={en:{n300:'Home',n301:'Local businesses',n950:'Logos',n951:'Login / Out',n952:'Sec. cameras',n302:'Topics'},es:{n300:'Inicio',n301:'Negocios locales',n950:'Logotipos',n951:'Entrar / Salir',n952:'Cámaras',n302:'Temas'},pt:{n300:'Início',n301:'Negócios locais',n950:'Logotipos',n951:'Entrar / Sair',n952:'Câmeras',n302:'Tópicos'}};
+    var W={en:{n300:'Home',n301:'Local businesses',n950:'Logos',n951:'Login / Out',n952:'Security cameras',n302:'Topics'},es:{n300:'Inicio',n301:'Negocios locales',n950:'Logotipos',n951:'Entrar / Salir',n952:'Cámaras de seguridad',n302:'Temas'},pt:{n300:'Início',n301:'Negócios locais',n950:'Logotipos',n951:'Entrar / Sair',n952:'Câmeras de segurança',n302:'Tópicos'}};
     for(var L in W){if(typeof I18N!=="undefined"&&I18N[L]){for(var k in W[L])I18N[L][k]=W[L][k]}}
   }catch(e){}
 
@@ -35,7 +35,7 @@
     {id:'services',key:'n1',label:'Services',parts:['#services','#access']},
     {id:'ai',key:'n2',label:'AI for business',parts:['#ai']},
     {id:'how',key:'n3',label:'How it works',parts:['#how']},
-    {id:'cams',key:'n952',label:'Sec. cameras',href:'/cameras'},
+    {id:'cams',key:'n952',label:'Security cameras',href:'/cameras'},
     {id:'logos',key:'n950',label:'Logos',href:'/logos'},
     {id:'websites',key:'n200',label:'Websites',href:'/websites'},
     {id:'local',key:'n301',label:'Local businesses',parts:['#local']},
