@@ -3,13 +3,13 @@
 (function(){
   /* words for the new tabs in all three languages (app.js swaps them when the language changes) */
   try{
-    var W={en:{n300:'Home',n301:'Local businesses',n950:'Logos',n302:'Topics'},es:{n300:'Inicio',n301:'Negocios locales',n950:'Logotipos',n302:'Temas'},pt:{n300:'Início',n301:'Negócios locais',n950:'Logotipos',n302:'Tópicos'}};
+    var W={en:{n300:'Home',n301:'Local businesses',n950:'Logos',n951:'Login / Out',n302:'Topics'},es:{n300:'Inicio',n301:'Negocios locales',n950:'Logotipos',n951:'Entrar / Salir',n302:'Temas'},pt:{n300:'Início',n301:'Negócios locais',n950:'Logotipos',n951:'Entrar / Sair',n302:'Tópicos'}};
     for(var L in W){if(typeof I18N!=="undefined"&&I18N[L]){for(var k in W[L])I18N[L][k]=W[L][k]}}
   }catch(e){}
 
   var css=''+
   '.mtabs{width:100%;margin:4px 0 2px;padding:10px 0 14px;display:flex;flex-wrap:wrap;gap:16px 12px;justify-content:flex-start}.mtabs .mtab{flex:1 1 auto}'+
-  '@media (min-width:1000px){.mtabs{display:grid;grid-template-columns:repeat(8,auto);justify-content:stretch}.mtabs .mtab{padding-left:4px;padding-right:4px}}'+
+  '@media (min-width:1000px){.mtabs .mtab{grid-row:2}.mtabs .mtab.mtab-login{grid-row:1;grid-column:8}.mtabs{display:grid;grid-template-columns:repeat(8,auto);justify-content:stretch}.mtabs .mtab{padding-left:4px;padding-right:4px}}'+
   /* glass keycap (design #5): the real Recraft keycap picture, stretched sideways to fit each word */
   '.mtab{position:relative;display:inline-flex;align-items:flex-start;justify-content:center;font-family:"MUIR Tech Display","Syne",sans-serif;font-weight:700;font-size:15px;letter-spacing:.08em;text-transform:uppercase;'+
    'color:#D9C68C;text-decoration:none;white-space:nowrap;cursor:pointer;height:74px;padding:0 26px;box-sizing:border-box;background:none;'+
@@ -37,14 +37,15 @@
     {id:'how',key:'n3',label:'How it works',parts:['#how']},
     {id:'logos',key:'n950',label:'Logos',href:'/logos'},
     {id:'websites',key:'n200',label:'Websites',href:'/websites'},
-    {id:'local',key:'n301',label:'Local businesses',parts:['#local']}
+    {id:'local',key:'n301',label:'Local businesses',parts:['#local']},
+    {id:'login',key:'n951',label:'Login / Out',href:'/account'}
   ];
   var nav=q('header.nav');if(!nav)return;
   var onHome=!!q('#top');
   if(!onHome){ /* other pages (e.g. /websites): the same buttons, as links back to each topic */
     var b2=document.createElement('nav');b2.className='mtabs';b2.setAttribute('aria-label','Topics');
-    var HREF={home:'/',services:'/#services',ai:'/#ai',how:'/#how',logos:'/logos',websites:'/websites',local:'/#local',contact:'/#contact'};
-    GROUPS.forEach(function(g){var a=document.createElement('a');a.className='mtab';a.href=HREF[g.id];var sp=document.createElement('span');sp.setAttribute('data-t',g.key);sp.textContent=g.label;a.appendChild(sp);
+    var HREF={home:'/',services:'/#services',ai:'/#ai',how:'/#how',logos:'/logos',websites:'/websites',local:'/#local',login:'/account',contact:'/#contact'};
+    GROUPS.forEach(function(g){var a=document.createElement('a');a.className='mtab'+(g.id==='login'?' mtab-login':'');a.href=HREF[g.id];var sp=document.createElement('span');sp.setAttribute('data-t',g.key);sp.textContent=g.label;a.appendChild(sp);
       if(location.pathname.replace(/\.html$/,'')===HREF[g.id]){a.setAttribute('aria-current','page');a.setAttribute('aria-selected','true')}b2.appendChild(a)});
     nav.appendChild(b2);return;
   }
@@ -52,7 +53,7 @@
   var list=document.createElement('div');list.setAttribute('role','tablist');list.style.display='contents';bar.appendChild(list);
   GROUPS.forEach(function(g){
     var el=document.createElement(g.href?'a':'button');
-    el.className='mtab';
+    el.className='mtab'+(g.id==='login'?' mtab-login':'');
     var sp=document.createElement('span');sp.setAttribute('data-t',g.key);sp.textContent=g.label;el.appendChild(sp);
     if(g.href){el.href=g.href}
     else{el.type='button';el.setAttribute('role','tab');el.setAttribute('aria-selected','false');el.id='mtab-'+g.id;

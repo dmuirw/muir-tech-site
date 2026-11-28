@@ -319,7 +319,7 @@ $('#wok').hidden=false;$('#wout').hidden=false;$('#wtext').focus();
 </script>
 <style id="bintrail">.bt{position:fixed;left:0;top:0;pointer-events:none;z-index:9999;font:600 10px/1 ui-monospace,'SF Mono',Menlo,monospace;color:#C3AF75;text-shadow:0 0 8px rgba(195,175,117,.8);animation:btf .9s ease-out forwards;will-change:transform,opacity}.bt.b1{color:#7FD3EE;text-shadow:0 0 8px rgba(42,143,176,.9)}@keyframes btf{from{opacity:1;transform:translate(var(--x),var(--y)) scale(1)}to{opacity:0;transform:translate(var(--x),calc(var(--y) + 14px)) scale(.6)}}</style>
 <script id="bintrailjs">(function(){if(!matchMedia('(pointer:fine)').matches||matchMedia('(prefers-reduced-motion: reduce)').matches)return;var S='011001001011100101010001010100010010101011000',k=0,lx=-99,ly=-99;addEventListener('mousemove',function(e){var dx=e.clientX-lx,dy=e.clientY-ly;if(dx*dx+dy*dy<81)return;lx=e.clientX;ly=e.clientY;var c=S[k++%S.length],s=document.createElement('span');s.className='bt'+(c==='1'?' b1':'');s.textContent=c;s.setAttribute('aria-hidden','true');s.style.setProperty('--x',(e.clientX+6)+'px');s.style.setProperty('--y',(e.clientY+4)+'px');document.body.appendChild(s);setTimeout(function(){s.remove()},950)},{passive:true})})();</script>
-<script src="tabs.js?v=5"></script>
+<script src="tabs.js?v=6"></script>
 
 <script>
 (function(){
