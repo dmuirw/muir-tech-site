@@ -242,7 +242,11 @@ html:has(#theme option[value="light"]:checked) .nav a.l{color:var(--ink)}
 @media (max-width:800px){.whero{padding:56px 20px 20px}.start,.job{padding:24px;margin-left:0;margin-right:0}.job{grid-template-columns:1fr}.job textarea{min-height:240px}.why li{padding:24px}}
 </style>
 <style id="mtfont">@font-face{font-family:'MUIR Tech Display';src:url(/assets/MUIRTechDisplay-Regular.woff2) format('woff2');font-display:swap}h1,h2,h3,.key,.mtab,.eyebrow,.run,.st,summary,legend{font-synthesis:none}</style>
-</head>
+<style id="qcss">.adm .quote,.adm .req{border:1px solid rgba(195,175,117,.45);border-radius:12px;padding:12px;margin:10px 0}.adm .req p{margin:2px 0}.adm h4{margin:0 0 8px;font-size:17px}
+.adm table.qt{width:100%;border-collapse:collapse}.adm .qt th{text-align:left;font-size:14px;color:var(--mut);padding:4px}.adm .qt td{padding:3px;vertical-align:top}.adm .qt td:nth-child(2),.adm .qt td:nth-child(3){width:120px}.adm .qt textarea{min-height:44px;resize:vertical}
+.adm .qt .rm{background:none;border:1px solid rgba(255,255,255,.3);color:var(--ink);border-radius:8px;width:38px;height:42px;cursor:pointer;font-size:16px}
+.adm .qtot{margin:10px 0 0 auto;max-width:380px}.adm .qtot p{display:flex;justify-content:space-between;margin:4px 0;font-size:17px}.adm .qtot p.big{font-size:21px;border-top:1px solid var(--gold);padding-top:6px}
+.adm .gatef{max-width:460px}@media(max-width:700px){.adm .qt td:nth-child(2),.adm .qt td:nth-child(3){width:86px}}</style></head>
 <body>
 <div class="wrap">
 <a class="skip" href="#main">Skip to main content</a>
@@ -281,7 +285,9 @@ html:has(#theme option[value="light"]:checked) .nav a.l{color:var(--ink)}
 </style>
 <p class="eyebrow">MUIR Tech · owner view</p><h1>Customers &amp; jobs</h1>
 <p id="aMsg" class="msg bad" hidden></p>
+<div id="gate" hidden></div>
 <div id="aBody" hidden>
+<div class="row" style="justify-content:flex-end;margin:0 0 10px"><button type="button" class="key k2" id="bLock">Lock owner page</button></div>
 <div class="stats" id="stats"></div>
 <div class="cols">
 <div><input id="find" placeholder="Find a customer" aria-label="Find a customer"><div id="list" style="margin-top:10px"></div>
@@ -289,6 +295,7 @@ html:has(#theme option[value="light"]:checked) .nav a.l{color:var(--ink)}
 </div>
 <div id="detail"><div class="glass pane"><p class="muted">Pick a customer on the left.</p></div></div>
 </div></div>
+<div id="pbBox" style="margin-top:16px"></div>
 </main>
 
 
@@ -333,6 +340,58 @@ function when(ms){return ms?new Date(ms).toLocaleString(undefined,{month:'short'
 function thread(list){var t=el('div','thread');if(!list.length)t.appendChild(el('p','muted','No messages yet.'));list.slice().sort(function(a,b){return a.id-b.id}).forEach(function(m){var b=el('div','bub '+(m.sender==='customer'?'c':'m'),m.body);b.appendChild(el('time','',(m.sender==='customer'?'Customer':'You')+' · '+when(m.created)));t.appendChild(b)});setTimeout(function(){t.scrollTop=t.scrollHeight},0);return t}
 function replyBox(email,pid){var f=el('form');var ta=el('textarea');ta.placeholder='Reply (they get an email or text)';ta.setAttribute('aria-label','Reply');var r=el('div','row');var b=el('button','key k1','Send reply');b.type='submit';r.appendChild(b);var m=el('p','msg');m.hidden=true;f.appendChild(ta);f.appendChild(r);f.appendChild(m);
  f.onsubmit=function(e){e.preventDefault();if(!ta.value.trim())return;b.disabled=true;api('/api/admin/message',{email:email,projectId:pid,body:ta.value}).then(function(x){b.disabled=false;if(!x.ok){m.hidden=false;m.className='msg bad';m.textContent=x.error;return}load(email)})};return f}
+var PB=[],QS={};
+function pnum(id){return 'MT-'+(1000+Number(id))}
+function money(v){var n=Math.round(parseFloat(String(v).replace(/[^0-9.\-]/g,''))*100)/100;return isFinite(n)?n:0}
+function fmt(n){return '$'+money(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}
+var QLAB={draft:'Draft (only you see it)',sent:'Quote sent to customer',approved:'Approved by customer',invoiced:'Bill sent to customer',paid:'Paid'};
+function requestBox(j){var x;try{x=JSON.parse(j.extra||'null')}catch(e){}if(!x)return null;var d=el('div','req');d.appendChild(el('h4','','Request details'));
+ [['Name',x.name],['Email',x.email],['Phone',x.phone],['Address',x.address],['Best date',x.date],['Business',x.business],['Service',x.service]].forEach(function(r){if(r[1])d.appendChild(el('p','',r[0]+': '+r[1]))});
+ Object.keys(x.answers||{}).forEach(function(k){var v=x.answers[k];d.appendChild(el('p','',k+': '+(Array.isArray(v)?v.join(', '):v)))});if(x.message)d.appendChild(el('p','','Message: '+x.message));return d}
+function quoteBox(j){var q=QS[j.id]||{lines:'[]',status:'draft',notes:''};var lines;try{lines=JSON.parse(q.lines||'[]')}catch(e){lines=[]}
+ var box=el('div','quote');box.appendChild(el('h4','','Quote / bill '+pnum(j.id)));
+ var tb=el('table','qt');tb.innerHTML='<thead><tr><th>Description</th><th>Materials</th><th>Labor</th><th aria-label="Remove"></th></tr></thead>';var body=el('tbody');tb.appendChild(body);box.appendChild(tb);
+ var tot=el('div','qtot');
+ function sum(){var m=0,l=0;[].forEach.call(body.querySelectorAll('tr'),function(r){m+=money(r.querySelector('.m').value);l+=money(r.querySelector('.l').value)});tot.innerHTML='';[['Total materials (tax included)',m],['Total labor',l],['Total job',m+l]].forEach(function(x,i){var p=el('p',i===2?'big':'');p.appendChild(el('span','',x[0]));p.appendChild(el('b','',fmt(x[1])));tot.appendChild(p)})}
+ function row(x){var r=el('tr');var c1=el('td'),d=el('textarea','d');d.rows=1;d.value=x.desc||'';d.setAttribute('aria-label','Description');c1.appendChild(d);
+  var c2=el('td'),m=el('input','m');m.inputMode='decimal';m.value=x.m?money(x.m).toFixed(2):'';m.placeholder='0.00';m.setAttribute('aria-label','Materials');c2.appendChild(m);
+  var c3=el('td'),l=el('input','l');l.inputMode='decimal';l.value=x.l?money(x.l).toFixed(2):'';l.placeholder='0.00';l.setAttribute('aria-label','Labor');c3.appendChild(l);
+  var c4=el('td'),x2=el('button','rm','✕');x2.type='button';x2.title='Remove line';x2.onclick=function(){r.remove();sum()};c4.appendChild(x2);
+  [m,l].forEach(function(i){i.oninput=sum;i.onblur=function(){if(i.value)i.value=money(i.value).toFixed(2)}});
+  r.appendChild(c1);r.appendChild(c2);r.appendChild(c3);r.appendChild(c4);body.appendChild(r)}
+ lines.forEach(row);if(!lines.length)row({});
+ var add=el('div','row');var b1=el('button','key k2','+ Add line');b1.type='button';b1.onclick=function(){row({});sum()};
+ var sel=el('select');sel.setAttribute('aria-label','Add from price book');var o0=el('option','','+ Add from price book…');o0.value='';sel.appendChild(o0);
+ var groups={};PB.forEach(function(p,i){(groups[p.group]=groups[p.group]||[]).push(i)});Object.keys(groups).forEach(function(g){var og=document.createElement('optgroup');og.label=g;groups[g].forEach(function(i){var o=el('option','',PB[i].desc+(PB[i].m||PB[i].l?' — '+fmt(money(PB[i].m)+money(PB[i].l)):''));o.value=i;og.appendChild(o)});sel.appendChild(og)});
+ sel.onchange=function(){if(sel.value==='')return;var p=PB[sel.value];row({desc:p.desc,m:p.m,l:p.l});sel.value='';sum()};
+ add.appendChild(b1);add.appendChild(sel);box.appendChild(add);box.appendChild(tot);
+ var nl=el('label','','Note to customer (shows on the quote)');var nt=el('textarea');nt.value=q.notes||'';nl.appendChild(nt);box.appendChild(nl);
+ var r2=el('div','row');var st=el('select');st.setAttribute('aria-label','Quote status');Object.keys(QLAB).forEach(function(k){var o=el('option','',QLAB[k]);o.value=k;if(k===q.status)o.selected=true;st.appendChild(o)});
+ var tl=el('label');tl.style.cssText='display:flex;gap:6px;align-items:center;margin:0;font-weight:400';var cb=el('input');cb.type='checkbox';cb.checked=true;cb.style.width='auto';tl.appendChild(cb);tl.appendChild(document.createTextNode('Tell the customer'));
+ var sv=el('button','key k1','Save quote');sv.type='button';var msg=el('p','msg');msg.hidden=true;
+ sv.onclick=function(){var L=[].map.call(body.querySelectorAll('tr'),function(r){return{desc:r.querySelector('.d').value,m:r.querySelector('.m').value,l:r.querySelector('.l').value}});sv.disabled=true;
+  api('/api/admin/quote',{projectId:j.id,lines:L,status:st.value,notes:nt.value,tell:cb.checked}).then(function(x){sv.disabled=false;msg.hidden=false;msg.className='msg '+(x.ok?'good':'bad');msg.textContent=x.ok?'Saved.':x.error;if(x.ok)load(cur)})};
+ r2.appendChild(st);r2.appendChild(tl);r2.appendChild(sv);box.appendChild(r2);
+ var r3=el('div','row');[['Download QuickBooks invoice (.csv)','invoice'],['Download as estimate (.csv)','estimate']].forEach(function(x){var a=el('a','key k2',x[0]);a.href='/api/admin/export?type='+x[1]+'&id='+j.id;r3.appendChild(a)});box.appendChild(r3);box.appendChild(msg);
+ sum();return box}
+function pbEditor(){var p=el('div','glass pane');p.appendChild(el('h2','','Price book'));p.appendChild(el('p','muted','Your standard items and prices. New quote requests are filled in from these, and you can add any of them to a quote. Taxes go in the materials price.'));
+ var tb=el('table','qt');tb.innerHTML='<thead><tr><th>Group</th><th>Description</th><th>Materials</th><th>Labor</th><th></th></tr></thead>';var body=el('tbody');tb.appendChild(body);p.appendChild(tb);
+ function row(x){var r=el('tr');r.dataset.key=x.key||'';[['g',x.group||'General'],['d',x.desc||''],['m',x.m?money(x.m).toFixed(2):''],['l',x.l?money(x.l).toFixed(2):'']].forEach(function(c){var td=el('td'),i=el('input',c[0]);i.value=c[1];if(c[0]==='m'||c[0]==='l'){i.inputMode='decimal';i.placeholder='0.00'}td.appendChild(i);r.appendChild(td)});var td=el('td'),b=el('button','rm','✕');b.type='button';b.onclick=function(){r.remove()};td.appendChild(b);r.appendChild(td);body.appendChild(r)}
+ PB.forEach(row);var rw=el('div','row');var a=el('button','key k2','+ Add item');a.type='button';a.onclick=function(){row({})};var s=el('button','key k1','Save price book');s.type='button';var m=el('p','msg');m.hidden=true;
+ s.onclick=function(){var items=[].map.call(body.querySelectorAll('tr'),function(r){return{key:r.dataset.key,group:r.querySelector('.g').value,desc:r.querySelector('.d').value,m:r.querySelector('.m').value,l:r.querySelector('.l').value}});api('/api/admin/pricebook',{items:items}).then(function(x){m.hidden=false;m.className='msg '+(x.ok?'good':'bad');m.textContent=x.ok?'Saved.':x.error;if(x.ok)load(cur)})};
+ rw.appendChild(a);rw.appendChild(s);p.appendChild(rw);p.appendChild(m);
+ var q=el('div','row');var c=el('a','key k2','Download all customers for QuickBooks (.csv)');c.href='/api/admin/export?type=customers';q.appendChild(c);p.appendChild(q);return p}
+function gate(){var g=$('gate');g.hidden=false;$('aBody').hidden=true;api('/api/adminpw/status').then(function(s){
+ if(!s.ok){g.innerHTML='';var p=el('p','msg bad',(s.error||'Owner sign-in needed.')+' ');var a=el('a','','Sign in');a.href='/account?ret=/admin';p.appendChild(a);g.appendChild(p);return}
+ if(s.unlocked)return load();
+ g.innerHTML='';var f=el('form','glass pane gatef');f.appendChild(el('h2','',s.has?'Owner password':'Set your owner password'));if(!s.has)f.appendChild(el('p','muted','First time here: pick a password of at least 10 characters. Only you can unlock this page, even when you are signed in.'));
+ var pw=el('input');pw.type='password';pw.autocomplete=s.has?'current-password':'new-password';pw.placeholder='Password';pw.setAttribute('aria-label','Password');f.appendChild(pw);
+ var r=el('div','row');var b=el('button','key k1',s.has?'Unlock':'Set password');b.type='submit';r.appendChild(b);var fg;if(s.has){fg=el('button','key k2','Forgot password');fg.type='button';r.appendChild(fg)}f.appendChild(r);var m=el('p','msg');m.hidden=true;f.appendChild(m);g.appendChild(f);pw.focus();
+ function say(t,ok){m.hidden=false;m.className='msg '+(ok?'good':'bad');m.textContent=t}
+ f.onsubmit=function(e){e.preventDefault();b.disabled=true;api(s.has?'/api/adminpw/unlock':'/api/adminpw/set',{password:pw.value}).then(function(x){b.disabled=false;if(!x.ok)return say(x.error);g.hidden=true;load()})};
+ if(fg)fg.onclick=function(){fg.disabled=true;api('/api/adminpw/forgot',{}).then(function(x){fg.disabled=false;if(!x.ok)return say(x.error);
+  f.innerHTML='';f.appendChild(el('h2','','Reset your password'));f.appendChild(el('p','muted','We emailed a 6-digit code to '+x.to+'.'));var cd=el('input');cd.placeholder='6-digit code';cd.inputMode='numeric';cd.setAttribute('aria-label','Code');var np=el('input');np.type='password';np.autocomplete='new-password';np.placeholder='New password (10+ characters)';np.setAttribute('aria-label','New password');np.style.marginTop='10px';f.appendChild(cd);f.appendChild(np);var rr=el('div','row');var bb=el('button','key k1','Save new password');bb.type='submit';rr.appendChild(bb);f.appendChild(rr);f.appendChild(m);
+  f.onsubmit=function(e){e.preventDefault();bb.disabled=true;api('/api/adminpw/reset',{code:cd.value,password:np.value}).then(function(y){bb.disabled=false;if(!y.ok)return say(y.error);g.hidden=true;load()})}})}})}
 function render(){var q=$('find').value.toLowerCase(),L=$('list');L.innerHTML='';
  var unread={};D.messages.forEach(function(m){if(m.sender==='customer'&&!m.seen_muir)unread[m.email]=(unread[m.email]||0)+1});
  var st=$('stats');st.innerHTML='';[['Customers',D.users.length],['Open jobs',D.projects.filter(function(p){return p.status!=='Done'}).length],['Unread messages',Object.keys(unread).reduce(function(a,k){return a+unread[k]},0)]].forEach(function(x){var d=el('div');d.appendChild(el('b','',x[1]));d.appendChild(document.createTextNode(x[0]));st.appendChild(d)});
@@ -341,13 +400,16 @@ function render(){var q=$('find').value.toLowerCase(),L=$('list');L.innerHTML=''
 function detail(){var u=D.users.filter(function(x){return x.email===cur})[0],box=$('detail');box.innerHTML='';if(!u)return;
  var p=el('div','glass pane');p.appendChild(el('h2','',u.name||u.email));p.appendChild(el('p','muted',u.email+(u.phone?' · '+u.phone:'')+(u.address?' · '+u.address:'')+' · tell them by '+(u.notify||'email')+' · joined '+when(u.created)+' · last in '+when(u.last_in)));
  p.appendChild(el('h3','','General messages'));p.appendChild(thread(D.messages.filter(function(m){return m.email===cur&&!m.project_id})));p.appendChild(replyBox(cur,null));box.appendChild(p);
- D.projects.filter(function(x){return x.email===cur}).forEach(function(j){var c=el('div','glass pane job');c.appendChild(el('h3','',j.title));c.appendChild(el('p','muted',j.kind+' · started '+when(j.created)));if(j.details)c.appendChild(el('p','',j.details));
+ D.projects.filter(function(x){return x.email===cur}).forEach(function(j){var c=el('div','glass pane job');c.appendChild(el('h3','',pnum(j.id)+' · '+j.title));c.appendChild(el('p','muted',j.kind+' · started '+when(j.created)));if(j.details)c.appendChild(el('p','',j.details));
   var r=el('div','row');var s=el('select');s.setAttribute('aria-label','Status');STAT.concat(STAT.indexOf(j.status)<0?[j.status]:[]).forEach(function(x){var o=el('option','',x);if(x===j.status)o.selected=true;s.appendChild(o)});var tl=el('label');tl.style.cssText='display:flex;gap:6px;align-items:center;margin:0;font-weight:400';var cb=el('input');cb.type='checkbox';cb.checked=true;cb.style.width='auto';tl.appendChild(cb);tl.appendChild(document.createTextNode('Tell the customer'));var sb=el('button','key k2','Update status');sb.type='button';sb.onclick=function(){sb.disabled=true;api('/api/admin/project',{id:j.id,status:s.value,tell:cb.checked}).then(function(){load(cur)})};r.appendChild(s);r.appendChild(tl);r.appendChild(sb);c.appendChild(r);
+  var rq=requestBox(j);if(rq)c.appendChild(rq);c.appendChild(quoteBox(j));
   c.appendChild(thread(D.messages.filter(function(m){return m.project_id===j.id})));c.appendChild(replyBox(cur,j.id));box.appendChild(c)})}
-function load(keep){api('/api/admin').then(function(r){if(!r.ok){$('aMsg').hidden=false;$('aMsg').innerHTML='';$('aMsg').appendChild(document.createTextNode(r.error+' '));var a=el('a','','Sign in');a.href='/account';$('aMsg').appendChild(a);return}D=r;$('aBody').hidden=false;cur=keep||cur;render()})}
+function load(keep){api('/api/admin').then(function(r){if(!r.ok){if(r.locked)return gate();$('aMsg').hidden=false;$('aMsg').innerHTML='';$('aMsg').appendChild(document.createTextNode(r.error+' '));var a=el('a','','Sign in');a.href='/account?ret=/admin';$('aMsg').appendChild(a);return}
+ D=r;PB=r.pricebook||[];QS={};(r.quotes||[]).forEach(function(q){QS[q.project_id]=q});$('gate').hidden=true;$('aBody').hidden=false;cur=keep||cur;var y=window.scrollY;render();var pb=$('pbBox');pb.innerHTML='';pb.appendChild(pbEditor());window.scrollTo(0,y)})}
+$('bLock').onclick=function(){api('/api/adminpw/lock',{}).then(function(){location.reload()})};
 $('find').oninput=render;
 $('fAdd').onsubmit=function(e){e.preventDefault();api('/api/admin/project',{email:$('aEm').value,title:$('aTi').value,kind:$('aKi').value,status:$('aSt').value,details:$('aDe').value}).then(function(r){var m=$('addMsg');m.hidden=false;m.className='msg '+(r.ok?'good':'bad');m.textContent=r.ok?'Added.':r.error;if(r.ok){cur=$('aEm').value.toLowerCase().trim();$('fAdd').reset();$('aSt').value='Scheduled';load(cur)}})};
-load();setInterval(function(){if(document.visibilityState==='visible')load()},60000);
+load();
 })();
 </script>
 

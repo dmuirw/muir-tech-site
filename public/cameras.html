@@ -263,7 +263,7 @@ html:has(#theme option[value="light"]:checked) .nav a.l{color:var(--ink)}
 .brands{grid-template-columns:repeat(auto-fit,minmax(min(230px,100%),1fr))}
 </style>
 <style id="camgal">.camgal{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(200px,100%),1fr));gap:14px;margin:6px 0 26px}.camgal figure{margin:0;border-radius:16px;overflow:hidden;border:1px solid var(--line,rgba(255,255,255,.15));background:#0b1418}.camgal img{display:block;width:100%;aspect-ratio:1/1;object-fit:cover}.camgal figcaption{padding:10px 12px;font-size:15px;line-height:1.3;color:var(--ink,#eee)}</style></head>
-<body>
+<body data-service="Security cameras">
 <div class="wrap">
 <a class="skip" href="#main">Skip to main content</a>
 <header class="nav glass">
@@ -347,7 +347,11 @@ html:has(#theme option[value="light"]:checked) .nav a.l{color:var(--ink)}
 <div class="job glass">
 <div class="who">
 <div class="field"><label for="wn">Your name</label><input id="wn" type="text" autocomplete="name"></div>
-<div class="field"><label for="wc">Phone or email</label><input id="wc" type="text" autocomplete="email"></div>
+<div class="field"><label for="we">Email</label><input id="we" type="email" autocomplete="email"></div>
+<div class="field"><label for="wp">Phone</label><input id="wp" type="tel" autocomplete="tel"></div>
+<div class="field"><label for="wa">Address where the work is</label><input id="wa" type="text" autocomplete="street-address"></div>
+<div class="field"><label for="wd">Best date to start</label><input id="wd" type="date"></div>
+<input id="whp" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px">
 <div class="field"><label for="wb">Town</label><input id="wb" type="text" autocomplete="address-level2"></div>
 <div class="field"><label for="wu">Brand (if you know it)</label><input id="wu" type="text"></div>
 </div>
@@ -357,7 +361,7 @@ html:has(#theme option[value="light"]:checked) .nav a.l{color:var(--ink)}
 </div>
 <div class="send">
 <button class="b3d" type="button" id="wsend"><span>Send to us</span></button>
-<p class="err" id="werr" role="alert" hidden>Please add your name and a phone number or email.</p>
+<p class="err" id="werr" role="alert" hidden>Please add your name and an email or phone number.</p>
 <p id="wok" role="status" hidden style="margin:0;font-size:19px"></p>
 </div>
 </div>
@@ -371,18 +375,16 @@ html:has(#theme option[value="light"]:checked) .nav a.l{color:var(--ink)}
 </div>
 <script>
 (function(){
-var $=function(s){return document.querySelector(s)};
+var $=function(s){return document.querySelector(s)},SERVICE=document.body.getAttribute('data-service');
 function vals(n){return Array.prototype.map.call(document.querySelectorAll('input[name="'+n+'"]:checked'),function(i){return i.value})}
 $('#wsend').addEventListener('click',function(){
-var name=$('#wn').value.trim(),c=$('#wc').value.trim(),btn=this;
-$('#werr').hidden=!!(name&&c);if(!(name&&c)){(!name?$('#wn'):$('#wc')).focus();return}
-var L=[];if($('#wb').value.trim())L.push('Town: '+$('#wb').value.trim());
-if($('#wu').value.trim())L.push('Brand: '+$('#wu').value.trim());
-[['where','Where'],['need','Needs'],['count','Cameras'],['have','Has cameras']].forEach(function(p){var v=vals(p[0]);if(v.length)L.push(p[1]+': '+v.join(', '))});
-if($('#wm').value.trim())L.push('','Job: '+$('#wm').value.trim());
-var ok=$('#wok');btn.disabled=true;ok.hidden=false;ok.style.color='';ok.textContent='Sending...';
-fetch('/api/contact',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({name:name,contact:c,topic:'Security camera request',message:L.join('\n')})}).then(function(r){return r.json()}).then(function(j){btn.disabled=false;
-if(j&&j.ok){ok.style.color='var(--gold)';ok.textContent='Thanks! Your request was sent. We will get back to you soon.'}else{ok.style.color='#F2B8A2';ok.textContent=(j&&j.error)||'It did not send. Please call or text (603) 600-2843.'}
+var name=$('#wn').value.trim(),em=$('#we').value.trim(),ph=$('#wp').value.trim(),btn=this,ok=$('#wok');
+var good=name&&(em||ph.replace(/\D/g,'').length>=10);$('#werr').hidden=good;if(!good){(!name?$('#wn'):$('#we')).focus();return}
+var A={},names={};[].forEach.call(document.querySelectorAll('.start input[name]'),function(i){names[i.name]=1});Object.keys(names).forEach(function(n){var v=vals(n);if(v.length)A[n]=v.length===1&&document.querySelector('input[name="'+n+'"]').type==='radio'?v[0]:v});
+if($('#wb').value.trim())A[$('label[for=wb]').textContent]=$('#wb').value.trim();if($('#wu').value.trim())A[$('label[for=wu]').textContent]=$('#wu').value.trim();
+btn.disabled=true;ok.hidden=false;ok.style.color='';ok.textContent='Sending...';
+fetch('/api/quote',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({service:SERVICE,name:name,email:em,phone:ph,address:$('#wa').value.trim(),date:$('#wd').value,answers:A,message:$('#wm').value.trim(),website:($('#whp')||{}).value||''})}).then(function(r){return r.json()}).then(function(j){btn.disabled=false;
+if(j&&j.ok){ok.style.color='var(--gold)';ok.textContent='Thanks! Your request '+j.number+' was sent. We will get back to you with a quote soon.'}else{ok.style.color='#F2B8A2';ok.textContent=(j&&j.error)||'It did not send. Please call or text (603) 600-2843.'}
 }).catch(function(){btn.disabled=false;ok.style.color='#F2B8A2';ok.textContent='It did not send. Please call or text (603) 600-2843.'});
 });
 })();

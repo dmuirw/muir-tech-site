@@ -210,7 +210,7 @@ async function auth(path, req, env, url) {
 }
 
 // ---------- the customer's own space ----------
-const KINDS = ['Computer repair', 'Upgrade or new build', 'Wi-Fi or network', 'Printer or devices', 'Audio or studio setup', 'Website', 'AI coaching', 'Shipping', 'Something else'];
+const KINDS = ['Computer repair', 'Upgrade or new build', 'Wi-Fi or network', 'Printer or devices', 'Audio or studio setup', 'Website', 'Logo', 'Security cameras', 'AI coaching', 'Shipping', 'Something else'];
 async function notifyCustomer(env, email, text, projectTitle) {
   const u = await env.DB.prepare('SELECT phone, notify FROM users WHERE email=?').bind(email).first() || {};
   const where = projectTitle ? ' about "' + projectTitle + '"' : '';
@@ -229,7 +229,9 @@ async function portal(path, req, env) {
     const projects = (await env.DB.prepare('SELECT id, title, kind, status, details, created, updated FROM projects WHERE email=? ORDER BY updated DESC').bind(email).all()).results;
     const messages = (await env.DB.prepare('SELECT id, project_id, sender, body, created, seen_customer FROM messages WHERE email=? ORDER BY id').bind(email).all()).results;
     await env.DB.prepare("UPDATE messages SET seen_customer=1 WHERE email=? AND sender='muir' AND seen_customer=0").bind(email).run();
-    return json({ ok: true, user: u, projects, messages, kinds: KINDS, textOn: textOn(env), owner: owners(env).includes(email) });
+    await qensure(env);
+    const quotes = (await env.DB.prepare("SELECT q.project_id, q.lines, q.status, q.notes, q.updated FROM quotes q JOIN projects p ON p.id=q.project_id WHERE p.email=? AND q.status!='draft'").bind(email).all()).results;
+    return json({ ok: true, user: u, projects, messages, quotes, kinds: KINDS, textOn: textOn(env), owner: owners(env).includes(email) });
   }
   let d; try { d = await req.json(); } catch { return bad('Bad request'); }
   if (path === '/api/portal/profile') {
@@ -247,6 +249,14 @@ async function portal(path, req, env) {
     await alertOwner(env, 'New MUIR Tech job request: ' + title, `${email} started a new job.\n\n${kind}: ${title}\n\n${details}\n\nOpen: https://muirtech.net/admin`);
     return json({ ok: true, id: r.meta && r.meta.last_row_id });
   }
+  if (path === '/api/portal/approve') {
+    await qensure(env); const pid = Number(d.projectId);
+    const q = await env.DB.prepare("SELECT q.status, p.title FROM quotes q JOIN projects p ON p.id=q.project_id WHERE q.project_id=? AND p.email=?").bind(pid, email).first();
+    if (!q || q.status !== 'sent') return bad('That quote cannot be approved right now.');
+    await env.DB.prepare("UPDATE quotes SET status='approved', updated=? WHERE project_id=?").bind(Date.now(), pid).run();
+    await alertOwner(env, 'Quote approved: ' + pnum(pid) + ' ' + q.title, email + ' approved quote ' + pnum(pid) + ' for "' + q.title + '".\n\nhttps://muirtech.net/admin');
+    return json({ ok: true });
+  }
   if (path === '/api/portal/message') {
     const body = clean(d.body, 4000); if (!body) return bad('Please type a message.');
     let pid = d.projectId ? Number(d.projectId) : null, title = '';
@@ -261,15 +271,190 @@ async function portal(path, req, env) {
   return bad('Not found', 404);
 }
 
+// ---------- quotes, price book, admin password, QuickBooks export (11-27-2026) ----------
+const pnum = (id) => 'MT-' + (1000 + Number(id));
+const money = (v) => { const n = Math.round(parseFloat(String(v).replace(/[^0-9.\-]/g, '')) * 100) / 100; return isFinite(n) ? n : 0; };
+const QSTAT = ['draft', 'sent', 'approved', 'invoiced', 'paid'];
+const PB_DEFAULT = [
+  // Security cameras
+  { key: 'cam-kit', group: 'Security cameras', desc: 'Ring camera kit', m: 125, l: 0 },
+  { key: 'cam-base', group: 'Security cameras', desc: 'Alarm base station / hub', m: 225, l: 0 },
+  { key: 'cam-labor', group: 'Security cameras', desc: 'Camera install labor', m: 0, l: 175 },
+  { key: 'cam-out', group: 'Security cameras', desc: 'Install outdoor camera(s)', m: 0, l: 0 },
+  { key: 'cam-in', group: 'Security cameras', desc: 'Install indoor camera(s)', m: 0, l: 0 },
+  { key: 'cam-door', group: 'Security cameras', desc: 'Install video doorbell', m: 0, l: 0 },
+  { key: 'cam-flood', group: 'Security cameras', desc: 'Install floodlight camera', m: 0, l: 0 },
+  { key: 'cam-alarm', group: 'Security cameras', desc: 'Alarm hub, keypad and door/window sensors', m: 0, l: 0 },
+  { key: 'cam-mon', group: 'Security cameras', desc: 'Set up 24/7 monitoring plan', m: 0, l: 0 },
+  { key: 'cam-wifi', group: 'Security cameras', desc: 'Extend Wi-Fi to reach cameras', m: 0, l: 0 },
+  { key: 'cam-app', group: 'Security cameras', desc: 'Phone app setup and walkthrough', m: 0, l: 0 },
+  // Logos
+  { key: 'logo-1', group: 'Logos', desc: 'Logo Fix (redraw and clean up current logo)', m: 0, l: 299 },
+  { key: 'logo-2', group: 'Logos', desc: 'Custom Logo (3 ideas, 3 rounds of changes)', m: 0, l: 699 },
+  { key: 'logo-3', group: 'Logos', desc: 'Brand Kit (logo, cards, social, email signature, brand guide)', m: 0, l: 1299 },
+  // Websites
+  { key: 'web-1', group: 'Websites', desc: 'Website Level 1: Refresh', m: 0, l: 0 },
+  { key: 'web-2', group: 'Websites', desc: 'Website Level 2: Tailored', m: 0, l: 0 },
+  { key: 'web-3', group: 'Websites', desc: 'Website Level 3: Custom', m: 0, l: 0 },
+  { key: 'web-4', group: 'Websites', desc: 'Website Level 4: Signature', m: 0, l: 0 },
+  { key: 'web-page', group: 'Websites', desc: 'Extra page', m: 0, l: 0 },
+  { key: 'web-domain', group: 'Websites', desc: 'Domain, hosting and email setup', m: 0, l: 0 },
+  { key: 'web-feat', group: 'Websites', desc: 'Feature', m: 0, l: 0 },
+  // General
+  { key: 'gen-visit', group: 'General', desc: 'Service visit', m: 0, l: 0 },
+  { key: 'gen-hour', group: 'General', desc: 'Labor (per hour)', m: 0, l: 0 },
+];
+async function getSet(env, k) { const r = await env.DB.prepare('SELECT v FROM settings WHERE k=?').bind(k).first(); return r ? r.v : null; }
+async function putSet(env, k, v) { await env.DB.prepare('INSERT INTO settings (k, v) VALUES (?, ?) ON CONFLICT(k) DO UPDATE SET v=excluded.v').bind(k, v).run(); }
+async function pricebook(env) { const v = await getSet(env, 'pricebook'); try { const a = JSON.parse(v); if (Array.isArray(a) && a.length) return a; } catch {} return PB_DEFAULT; }
+let qready = false;
+async function qensure(env) {
+  await ensure(env); if (qready) return;
+  await env.DB.batch([
+    env.DB.prepare('CREATE TABLE IF NOT EXISTS quotes (project_id INTEGER PRIMARY KEY, lines TEXT, status TEXT DEFAULT \'draft\', notes TEXT, updated INTEGER)'),
+    env.DB.prepare('CREATE TABLE IF NOT EXISTS settings (k TEXT PRIMARY KEY, v TEXT)'),
+    env.DB.prepare('CREATE TABLE IF NOT EXISTS admin_sessions (h TEXT PRIMARY KEY, exp INTEGER)'),
+    env.DB.prepare('CREATE TABLE IF NOT EXISTS admin_tries (ip TEXT, t INTEGER)'),
+  ]);
+  try { await env.DB.prepare('ALTER TABLE projects ADD COLUMN extra TEXT').run(); } catch {}
+  qready = true;
+}
+function cleanLines(lines) {
+  return (Array.isArray(lines) ? lines : []).slice(0, 80).map((x) => ({ desc: clean(x && x.desc, 300), m: money(x && x.m), l: money(x && x.l) })).filter((x) => x.desc || x.m || x.l);
+}
+const totals = (lines) => { const m = lines.reduce((a, x) => a + money(x.m), 0), l = lines.reduce((a, x) => a + money(x.l), 0); return { m: Math.round(m * 100) / 100, l: Math.round(l * 100) / 100, t: Math.round((m + l) * 100) / 100 }; };
+function draftLines(service, a, pb) {
+  const P = {}; pb.forEach((x) => { P[x.key] = x; });
+  const L = []; const add = (key, desc) => { const p = P[key] || { desc: '', m: 0, l: 0 }; L.push({ desc: desc || p.desc, m: money(p.m), l: money(p.l) }); };
+  const arr = (v) => (Array.isArray(v) ? v : v ? [v] : []);
+  if (service === 'Security cameras') {
+    const n = String(a.count || '').trim(), N = n ? ' (' + n + ')' : '';
+    arr(a.need).forEach((x) => {
+      if (/outdoor/i.test(x)) add('cam-out', 'Install outdoor camera(s)' + N);
+      else if (/indoor/i.test(x)) add('cam-in', 'Install indoor camera(s)' + N);
+      else if (/doorbell/i.test(x)) add('cam-door');
+      else if (/flood/i.test(x)) add('cam-flood');
+      else if (/alarm|sensor/i.test(x)) add('cam-alarm');
+      else if (/monitor/i.test(x)) add('cam-mon');
+      else if (/wi-?fi/i.test(x)) add('cam-wifi');
+      else L.push({ desc: x, m: 0, l: 0 });
+    });
+    if (/help me choose|no/i.test(String(a.have || ''))) add('cam-kit');
+    add('cam-app');
+  } else if (service === 'Logos') {
+    const lv = String(a.level || ''); add(/brand/i.test(lv) ? 'logo-3' : /custom/i.test(lv) ? 'logo-2' : /fix/i.test(lv) ? 'logo-1' : 'logo-2');
+  } else if (service === 'Websites') {
+    const lv = String(a.level || ''); const m = lv.match(/[1-4]/); add('web-' + (m ? m[0] : '2'));
+    if (a.pages) L.push({ desc: 'Pages: ' + a.pages, m: 0, l: 0 });
+    arr(a.do).forEach((x) => add('web-feat', 'Feature: ' + x));
+    if (arr(a.now).some((x) => /no website|domain/i.test(x))) add('web-domain');
+  } else add('gen-visit');
+  return L;
+}
+async function adminPwOk(env, pw) {
+  const v = await getSet(env, 'admin_pw'); if (!v) return false;
+  const [salt, h] = v.split(':'); return h === await sha('apw|' + salt + '|' + pw);
+}
+async function setAdminPw(env, pw) { const salt = token(16); await putSet(env, 'admin_pw', salt + ':' + await sha('apw|' + salt + '|' + pw)); await env.DB.prepare('DELETE FROM admin_sessions').run(); }
+const adminCookie = (s, age) => `mt_admin=${s}; Path=/; Max-Age=${age}; HttpOnly; Secure; SameSite=Strict`;
+async function adminUnlocked(env, req) { const s = cookie(req, 'mt_admin'); if (s.length < 30) return false; const r = await env.DB.prepare('SELECT exp FROM admin_sessions WHERE h=?').bind(await sha('a|' + s)).first(); return !!(r && r.exp > Date.now()); }
+async function tooMany(env, req) { const ip = await sha('ip|' + ipOf(req)), t = Date.now(); const r = await env.DB.prepare('SELECT COUNT(*) c FROM admin_tries WHERE ip=? AND t>?').bind(ip, t - 15 * 60e3).first(); return { ip, block: r && r.c >= 6 }; }
+const pwRule = (pw) => String(pw || '').length >= 10;
+async function adminPw(path, req, env) {
+  const email = await userOf(env, req);
+  if (!email || !owners(env).includes(email)) return bad('Owner sign-in needed.', 403);
+  await qensure(env);
+  const has = !!(await getSet(env, 'admin_pw'));
+  if (path === '/api/adminpw/status') return json({ ok: true, has, unlocked: has && await adminUnlocked(env, req), emailOn: emailOn(env) });
+  let d; try { d = await req.json(); } catch { return bad('Bad request'); }
+  const lim = await tooMany(env, req); if (lim.block) return bad('Too many tries. Wait 15 minutes and try again.', 429);
+  const fail = async (m) => { await env.DB.prepare('INSERT INTO admin_tries (ip, t) VALUES (?, ?)').bind(lim.ip, Date.now()).run(); return bad(m, 401); };
+  const unlock = async () => { const s = token(32); await env.DB.prepare('INSERT INTO admin_sessions (h, exp) VALUES (?, ?)').bind(await sha('a|' + s), Date.now() + 12 * 3600e3).run(); return json({ ok: true }, 200, { 'set-cookie': adminCookie(s, 12 * 3600) }); };
+  if (path === '/api/adminpw/set') {
+    if (has && !(await adminPwOk(env, d.current || ''))) return fail('Your current password is not right.');
+    if (!pwRule(d.password)) return bad('Use at least 10 characters.');
+    await setAdminPw(env, d.password); return unlock();
+  }
+  if (path === '/api/adminpw/unlock') { if (!has) return bad('Set a password first.'); if (!(await adminPwOk(env, d.password || ''))) return fail('That password is not right.'); return unlock(); }
+  if (path === '/api/adminpw/lock') { await env.DB.prepare('DELETE FROM admin_sessions WHERE h=?').bind(await sha('a|' + cookie(req, 'mt_admin'))).run(); return json({ ok: true }, 200, { 'set-cookie': adminCookie('x', 0) }); }
+  if (path === '/api/adminpw/forgot') {
+    const code = six(); await putSet(env, 'admin_reset', JSON.stringify({ h: await sha('ar|' + code), exp: Date.now() + 15 * 60e3, tries: 0 }));
+    const to = env.OWNER_EMAIL || 'muirtechnh@gmail.com';
+    const ok = await sendEmail(env, to, 'MUIR Tech owner password reset code', 'Your reset code: ' + code + '\nIt works for 15 minutes. If you did not ask for this, ignore it.', '<p style="font:16px system-ui">Your MUIR Tech owner password reset code:</p><p style="font:700 34px monospace;letter-spacing:6px">' + code + '</p><p style="font:14px system-ui;color:#666">It works for 15 minutes. If you did not ask for this, ignore it.</p>');
+    return ok ? json({ ok: true, to }) : bad('The email did not go out. Try again in a minute.', 502);
+  }
+  if (path === '/api/adminpw/reset') {
+    let r; try { r = JSON.parse(await getSet(env, 'admin_reset')); } catch {}
+    if (!r || r.exp < Date.now() || r.tries >= 5) return bad('That code has expired. Ask for a new one.');
+    if (r.h !== await sha('ar|' + String(d.code || '').replace(/\D/g, ''))) { r.tries++; await putSet(env, 'admin_reset', JSON.stringify(r)); return fail('That code is not right.'); }
+    if (!pwRule(d.password)) return bad('Use at least 10 characters.');
+    await putSet(env, 'admin_reset', ''); await setAdminPw(env, d.password); return unlock();
+  }
+  return bad('Not found', 404);
+}
+function csvCell(v) { v = String(v == null ? '' : v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }
+function csv(rows) { return rows.map((r) => r.map(csvCell).join(',')).join('\r\n') + '\r\n'; }
+const mdy = (ms) => { const d = new Date(ms); return String(d.getMonth() + 1).padStart(2, '0') + '/' + String(d.getDate()).padStart(2, '0') + '/' + d.getFullYear(); };
+async function qbExport(env, url) {
+  const kind = url.searchParams.get('type') || 'invoice', id = Number(url.searchParams.get('id') || 0);
+  if (kind === 'customers') {
+    const us = (await env.DB.prepare('SELECT email, name, phone, address FROM users ORDER BY name').all()).results;
+    const rows = [['Name', 'Company', 'Email', 'Phone', 'Street', 'Notes']].concat(us.map((u) => [u.name || u.email, '', u.email, u.phone || '', u.address || '', '']));
+    return new Response(csv(rows), { headers: { 'content-type': 'text/csv; charset=utf-8', 'content-disposition': 'attachment; filename="MUIR TECH CUSTOMERS.csv"', 'cache-control': 'no-store' } });
+  }
+  const p = await env.DB.prepare('SELECT * FROM projects WHERE id=?').bind(id).first(); if (!p) return bad('Not found', 404);
+  const q = await env.DB.prepare('SELECT * FROM quotes WHERE project_id=?').bind(id).first() || { lines: '[]' };
+  const u = await env.DB.prepare('SELECT name FROM users WHERE email=?').bind(p.email).first() || {};
+  const lines = JSON.parse(q.lines || '[]'), now = Date.now(), cust = u.name || p.email, no = pnum(id);
+  const rows = [['InvoiceNo', 'Customer', 'InvoiceDate', 'DueDate', 'Terms', 'Memo', 'Item(Product/Service)', 'ItemDescription', 'ItemQuantity', 'ItemRate', 'ItemAmount', 'Taxable']];
+  lines.forEach((x) => {
+    if (money(x.m)) rows.push([no, cust, mdy(now), mdy(now + 30 * 864e5), 'Net 30', p.title, 'Materials', x.desc, 1, money(x.m).toFixed(2), money(x.m).toFixed(2), 'N']);
+    if (money(x.l)) rows.push([no, cust, mdy(now), mdy(now + 30 * 864e5), 'Net 30', p.title, 'Labor', x.desc, 1, money(x.l).toFixed(2), money(x.l).toFixed(2), 'N']);
+  });
+  return new Response(csv(rows), { headers: { 'content-type': 'text/csv; charset=utf-8', 'content-disposition': `attachment; filename="MUIR TECH ${no} ${kind === 'estimate' ? 'ESTIMATE' : 'INVOICE'}.csv"`, 'cache-control': 'no-store' } });
+}
+async function quoteRequest(req, env) {
+  if (!env.DB) return bad('Please call (603) 600-2843 for now.', 503);
+  await qensure(env);
+  const b = await req.json().catch(() => ({})); if (b.website) return json({ ok: true });
+  const name = clean(b.name, 100), email = clean(b.email, 190).toLowerCase(), phone = clean(b.phone, 30), address = clean(b.address, 200), date = clean(b.date, 40), biz = clean(b.business, 120);
+  const service = ['Websites', 'Logos', 'Security cameras'].includes(b.service) ? b.service : 'Something else';
+  if (!name || (!okEmail(email) && phone.replace(/\D/g, '').length < 10)) return bad('Please add your name and an email or phone number.');
+  const ip = await sha('ip|' + ipOf(req)), now = Date.now();
+  const n = await env.DB.prepare("SELECT COUNT(*) c FROM sends WHERE ip=? AND email='quote' AND t>?").bind(ip, now - 3600e3).first();
+  if (n && n.c >= 6) return bad('Too many requests. Please call or text (603) 600-2843.', 429);
+  await env.DB.prepare("INSERT INTO sends (email, ip, t) VALUES ('quote', ?, ?)").bind(ip, now).run();
+  const answers = {}; Object.entries(b.answers || {}).slice(0, 30).forEach(([k, v]) => { answers[clean(k, 40)] = Array.isArray(v) ? v.slice(0, 20).map((x) => clean(x, 120)) : clean(v, 600); });
+  const who = okEmail(email) ? email : 'phone-' + phone.replace(/\D/g, '') + '@no-email.muirtech.net';
+  await env.DB.prepare('INSERT OR IGNORE INTO users (email, created, last_in, notify) VALUES (?,?,0,\'email\')').bind(who, now).run();
+  await env.DB.prepare("UPDATE users SET name=COALESCE(NULLIF(name,''),?), phone=COALESCE(NULLIF(phone,''),?), address=COALESCE(NULLIF(address,''),?) WHERE email=?").bind(name, phone, address, who).run();
+  const kind = service === 'Websites' ? 'Website' : service === 'Something else' ? 'Something else' : service === 'Logos' ? 'Logo' : 'Security cameras';
+  const lvl = answers.level ? ' · ' + (Array.isArray(answers.level) ? answers.level.join(', ') : answers.level) : '';
+  const title = (service === 'Something else' ? 'Quote request' : service + ' quote') + lvl;
+  const extra = JSON.stringify({ name, email: okEmail(email) ? email : '', phone, address, date, business: biz, service, answers, message: clean(b.message, 3000) });
+  const details = clean(b.message, 3000);
+  const r = await env.DB.prepare('INSERT INTO projects (email, title, kind, status, details, created, updated, extra) VALUES (?,?,?,?,?,?,?,?)').bind(who, title.slice(0, 100), kind, 'New request', details, now, now, extra).run();
+  const id = r.meta && r.meta.last_row_id;
+  const lines = draftLines(service, answers, await pricebook(env));
+  await env.DB.prepare('INSERT INTO quotes (project_id, lines, status, notes, updated) VALUES (?,?,?,?,?)').bind(id, JSON.stringify(lines), 'draft', '', now).run();
+  const ans = Object.entries(answers).map(([k, v]) => k + ': ' + (Array.isArray(v) ? v.join(', ') : v)).join('\n');
+  await alertOwner(env, 'New quote request ' + pnum(id) + ': ' + title, `${pnum(id)} · ${title}\n\nName: ${name}\nEmail: ${email || '-'}\nPhone: ${phone || '-'}\nAddress: ${address || '-'}\nBest date: ${date || '-'}${biz ? '\nBusiness: ' + biz : ''}\n\n${ans}\n\n${details}\n\nA draft quote is ready to price: https://muirtech.net/admin`);
+  return json({ ok: true, number: pnum(id) });
+}
+
 // ---------- David's view ----------
 async function admin(path, req, env) {
   const email = await userOf(env, req);
   if (!email || !owners(env).includes(email)) return bad('Owner sign-in needed.', 403);
+  await qensure(env);
+  if (!(await adminUnlocked(env, req))) return json({ ok: false, locked: true, error: 'Enter your owner password.' }, 401);
+  if (path === '/api/admin/export') return qbExport(env, new URL(req.url));
   if (path === '/api/admin' && req.method === 'GET') {
     const users = (await env.DB.prepare('SELECT email, name, phone, notify, address, created, last_in FROM users ORDER BY last_in DESC LIMIT 1000').all()).results;
-    const projects = (await env.DB.prepare('SELECT id, email, title, kind, status, details, created, updated FROM projects ORDER BY updated DESC LIMIT 2000').all()).results;
+    const projects = (await env.DB.prepare('SELECT id, email, title, kind, status, details, created, updated, extra FROM projects ORDER BY updated DESC LIMIT 2000').all()).results;
     const messages = (await env.DB.prepare('SELECT id, email, project_id, sender, body, created, seen_muir FROM messages ORDER BY id DESC LIMIT 5000').all()).results;
-    return json({ ok: true, me: email, users, projects, messages, emailOn: emailOn(env), textOn: textOn(env) });
+    const quotes = (await env.DB.prepare('SELECT project_id, lines, status, notes, updated FROM quotes').all()).results;
+    return json({ ok: true, me: email, users, projects, messages, quotes, pricebook: await pricebook(env), emailOn: emailOn(env), textOn: textOn(env) });
   }
   let d; try { d = await req.json(); } catch { return bad('Bad request'); }
   const cust = String(d.email || '').toLowerCase().trim();
@@ -285,6 +470,19 @@ async function admin(path, req, env) {
     await env.DB.prepare('INSERT OR IGNORE INTO users (email, created, last_in, notify) VALUES (?,?,0,\'email\')').bind(cust, now).run();
     const r = await env.DB.prepare('INSERT INTO projects (email, title, kind, status, details, created, updated) VALUES (?,?,?,?,?,?,?)').bind(cust, title, KINDS.includes(d.kind) ? d.kind : 'Something else', clean(d.status, 40) || 'Scheduled', clean(d.details, 4000), now, now).run();
     return json({ ok: true, id: r.meta && r.meta.last_row_id });
+  }
+  if (path === '/api/admin/quote') {
+    const pid = Number(d.projectId); const p = await env.DB.prepare('SELECT email, title FROM projects WHERE id=?').bind(pid).first(); if (!p) return bad('Job not found.', 404);
+    const lines = cleanLines(d.lines), st = QSTAT.includes(d.status) ? d.status : 'draft', now = Date.now();
+    const old = await env.DB.prepare('SELECT status FROM quotes WHERE project_id=?').bind(pid).first();
+    await env.DB.prepare('INSERT INTO quotes (project_id, lines, status, notes, updated) VALUES (?,?,?,?,?) ON CONFLICT(project_id) DO UPDATE SET lines=excluded.lines, status=excluded.status, notes=excluded.notes, updated=excluded.updated').bind(pid, JSON.stringify(lines), st, clean(d.notes, 2000), now).run();
+    await env.DB.prepare('UPDATE projects SET updated=? WHERE id=?').bind(now, pid).run();
+    if (d.tell && st !== 'draft' && (!old || old.status !== st)) { const t = totals(lines); await notifyCustomer(env, p.email, (st === 'sent' ? 'Your quote ' : st === 'invoiced' ? 'Your bill ' : 'Your quote ') + pnum(pid) + ' for "' + p.title + '" is ready: $' + t.t.toFixed(2) + '. See it in your account.', p.title); }
+    return json({ ok: true });
+  }
+  if (path === '/api/admin/pricebook') {
+    const pb = (Array.isArray(d.items) ? d.items : []).slice(0, 300).map((x, i) => ({ key: clean(x.key, 40) || 'item-' + i, group: clean(x.group, 40) || 'General', desc: clean(x.desc, 200), m: money(x.m), l: money(x.l) })).filter((x) => x.desc);
+    await putSet(env, 'pricebook', JSON.stringify(pb)); return json({ ok: true });
   }
   if (path === '/api/admin/message') {
     const body = clean(d.body, 4000); if (!okEmail(cust) || !body) return bad('Customer and message are needed.');
@@ -332,6 +530,8 @@ export default {
         return Response.json({ ok: true });
       } catch (e) { return Response.json({ ok: false, error: 'Something went wrong. Please call or text (603) 600-2843.' }, { status: 500 }); }
     }
+    if (path === '/api/quote' && req.method === 'POST') { try { return await quoteRequest(req, env); } catch (e) { return bad('Something went wrong. Please call (603) 600-2843.', 500); } }
+    if (path.startsWith('/api/adminpw')) { if (!env.DB) return bad('Not ready', 503); try { return await adminPw(path, req, env); } catch (e) { return bad('Something went wrong.', 500); } }
     if (path.startsWith('/api/auth') || path.startsWith('/api/portal') || path.startsWith('/api/admin')) {
       if (!env.DB) return bad('Customer accounts are being set up. Please call or email us for now.', 503);
       try {

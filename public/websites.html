@@ -242,7 +242,7 @@ html:has(#theme option[value="light"]:checked) .nav a.l{color:var(--ink)}
 </style>
 <style id="mtfont">@font-face{font-family:'MUIR Tech Display';src:url(/assets/MUIRTechDisplay-Regular.woff2) format('woff2');font-display:swap}h1,h2,h3,.key,.mtab,.eyebrow,.run,.st,summary,legend{font-synthesis:none}</style>
 <style id="btn3d">.b3d{position:relative;display:inline-flex;align-items:flex-start;justify-content:center;font-family:"MUIR Tech Display","Syne",sans-serif;font-weight:700;font-size:15px;letter-spacing:.08em;text-transform:uppercase;color:#D9C68C;text-decoration:none;white-space:nowrap;cursor:pointer;height:74px;min-width:230px;padding:0 26px;box-sizing:border-box;background:none!important;box-shadow:none!important;border-style:solid;border-width:0 22px;border-color:transparent;border-image:url(/assets/keycap-btn.webp) 0 96 fill / 0 22px stretch;border-radius:0;text-shadow:0 1px 0 rgba(0,0,0,.8),0 0 10px rgba(195,175,117,.25);transition:transform .14s cubic-bezier(.3,.7,.4,1),filter .2s}.b3d>span{display:block;margin-top:13px;line-height:1.2}.b3d:hover{transform:translateY(5px) scaleY(.96);filter:brightness(1.12) drop-shadow(0 0 10px rgba(42,200,230,.45))}.b3d:active{transform:translateY(8px) scaleY(.92)}.b3d:focus-visible{outline:3px solid #C3AF75;outline-offset:5px}.b3d:disabled{opacity:.6;cursor:wait}@media (prefers-reduced-motion:reduce){.b3d{transition:none}.b3d:hover,.b3d:active{transform:none}}</style></head>
-<body>
+<body data-service="Websites">
 <div class="wrap">
 <a class="skip" href="#main">Skip to main content</a>
 <header class="nav glass">
@@ -319,7 +319,11 @@ html:has(#theme option[value="light"]:checked) .nav a.l{color:var(--ink)}
 <div class="job glass">
 <div class="who">
 <div class="field"><label for="wn">Your name</label><input id="wn" type="text" autocomplete="name"></div>
-<div class="field"><label for="wc">Phone or email</label><input id="wc" type="text" autocomplete="email"></div>
+<div class="field"><label for="we">Email</label><input id="we" type="email" autocomplete="email"></div>
+<div class="field"><label for="wp">Phone</label><input id="wp" type="tel" autocomplete="tel"></div>
+<div class="field"><label for="wa">Address where the work is</label><input id="wa" type="text" autocomplete="street-address"></div>
+<div class="field"><label for="wd">Best date to start</label><input id="wd" type="date"></div>
+<input id="whp" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px">
 <div class="field"><label for="wb">Business name</label><input id="wb" type="text" autocomplete="organization"></div>
 <div class="field"><label for="wu">Current website (if you have one)</label><input id="wu" type="url" inputmode="url" placeholder="https://"></div>
 </div>
@@ -329,9 +333,9 @@ html:has(#theme option[value="light"]:checked) .nav a.l{color:var(--ink)}
 </div>
 <div class="send">
 <button class="b3d" type="button" id="wsend"><span>Send to us</span></button>
-<p class="err" id="werr" role="alert" hidden>Please add your name and a phone number or email.</p>
-<p id="wok" hidden style="margin:0;font-size:19px">Thanks! Tap a button to send it by text or email.</p>
-<div class="sendout" id="wout" hidden><a class="key k1" id="wtext" href="#">Text David</a><a class="key k2" id="wmail" href="#">Email David</a></div>
+<p class="err" id="werr" role="alert" hidden>Please add your name and an email or phone number.</p>
+<p id="wok" role="status" hidden style="margin:0;font-size:19px"></p>
+
 </div>
 </div>
 </section>
@@ -344,20 +348,17 @@ html:has(#theme option[value="light"]:checked) .nav a.l{color:var(--ink)}
 </div>
 <script>
 (function(){
-var $=function(s){return document.querySelector(s)};
+var $=function(s){return document.querySelector(s)},SERVICE=document.body.getAttribute('data-service');
 function vals(n){return Array.prototype.map.call(document.querySelectorAll('input[name="'+n+'"]:checked'),function(i){return i.value})}
 $('#wsend').addEventListener('click',function(){
-var name=$('#wn').value.trim(),c=$('#wc').value.trim();
-$('#werr').hidden=!!(name&&c);if(!(name&&c)){(!name?$('#wn'):$('#wc')).focus();return}
-var L=['Website request from '+name,'Contact: '+c];
-if($('#wb').value.trim())L.push('Business: '+$('#wb').value.trim());
-if($('#wu').value.trim())L.push('Current site: '+$('#wu').value.trim());
-[['now','Now'],['level','Level'],['do','Site should'],['have','Has'],['pages','Pages'],['when','When']].forEach(function(p){var v=vals(p[0]);if(v.length)L.push(p[1]+': '+v.join(', '))});
-if($('#wm').value.trim())L.push('','Job: '+$('#wm').value.trim());
-var b=L.join('\n');
-$('#wtext').href='sms:+16036002843?&body='+encodeURIComponent(b);
-$('#wmail').href='mailto:muirtechnh@gmail.com?subject='+encodeURIComponent('Website request from '+name)+'&body='+encodeURIComponent(b);
-$('#wok').hidden=false;$('#wout').hidden=false;$('#wtext').focus();
+var name=$('#wn').value.trim(),em=$('#we').value.trim(),ph=$('#wp').value.trim(),btn=this,ok=$('#wok');
+var good=name&&(em||ph.replace(/\D/g,'').length>=10);$('#werr').hidden=good;if(!good){(!name?$('#wn'):$('#we')).focus();return}
+var A={},names={};[].forEach.call(document.querySelectorAll('.start input[name]'),function(i){names[i.name]=1});Object.keys(names).forEach(function(n){var v=vals(n);if(v.length)A[n]=v.length===1&&document.querySelector('input[name="'+n+'"]').type==='radio'?v[0]:v});
+if($('#wb').value.trim())A[$('label[for=wb]').textContent]=$('#wb').value.trim();if($('#wu').value.trim())A[$('label[for=wu]').textContent]=$('#wu').value.trim();
+btn.disabled=true;ok.hidden=false;ok.style.color='';ok.textContent='Sending...';
+fetch('/api/quote',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({service:SERVICE,name:name,email:em,phone:ph,address:$('#wa').value.trim(),date:$('#wd').value,answers:A,message:$('#wm').value.trim(),website:($('#whp')||{}).value||''})}).then(function(r){return r.json()}).then(function(j){btn.disabled=false;
+if(j&&j.ok){ok.style.color='var(--gold)';ok.textContent='Thanks! Your request '+j.number+' was sent. We will get back to you with a quote soon.'}else{ok.style.color='#F2B8A2';ok.textContent=(j&&j.error)||'It did not send. Please call or text (603) 600-2843.'}
+}).catch(function(){btn.disabled=false;ok.style.color='#F2B8A2';ok.textContent='It did not send. Please call or text (603) 600-2843.'});
 });
 })();
 </script>
