@@ -3,7 +3,7 @@
 (function(){
   /* words for the new tabs in all three languages (app.js swaps them when the language changes) */
   try{
-    var W={en:{n300:'Home',n301:'Local businesses',n303:'Logos',n302:'Topics'},es:{n300:'Inicio',n301:'Negocios locales',n303:'Logotipos',n302:'Temas'},pt:{n300:'Início',n301:'Negócios locais',n303:'Logotipos',n302:'Tópicos'}};
+    var W={en:{n300:'Home',n301:'Local businesses',n950:'Logos',n302:'Topics'},es:{n300:'Inicio',n301:'Negocios locales',n950:'Logotipos',n302:'Temas'},pt:{n300:'Início',n301:'Negócios locais',n950:'Logotipos',n302:'Tópicos'}};
     for(var L in W){if(typeof I18N!=="undefined"&&I18N[L]){for(var k in W[L])I18N[L][k]=W[L][k]}}
   }catch(e){}
 
@@ -35,7 +35,7 @@
     {id:'services',key:'n1',label:'Services',parts:['#services','#access']},
     {id:'ai',key:'n2',label:'AI for business',parts:['#ai']},
     {id:'how',key:'n3',label:'How it works',parts:['#how']},
-    {id:'logos',key:'n303',label:'Logos',href:'/logos'},
+    {id:'logos',key:'n950',label:'Logos',href:'/logos'},
     {id:'websites',key:'n200',label:'Websites',href:'/websites'},
     {id:'local',key:'n301',label:'Local businesses',parts:['#local']}
   ];
