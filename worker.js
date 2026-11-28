@@ -1,3 +1,4 @@
+import { CATALOG_DEFAULT } from './catalog.js';
 // MUIR Tech worker: the website (static files in ./public) plus
 //  - /api/translate              Spanish/Portuguese -> English for the contact form (Workers AI)
 //  - /api/auth/*                 customer sign-in: Google, Apple, or a 6-digit code by email (no passwords)
@@ -307,6 +308,14 @@ const PB_DEFAULT = [
 ];
 async function getSet(env, k) { const r = await env.DB.prepare('SELECT v FROM settings WHERE k=?').bind(k).first(); return r ? r.v : null; }
 async function putSet(env, k, v) { await env.DB.prepare('INSERT INTO settings (k, v) VALUES (?, ?) ON CONFLICT(k) DO UPDATE SET v=excluded.v').bind(k, v).run(); }
+async function catalog(env) { const v = await getSet(env, 'catalog'); try { const a = JSON.parse(v); if (Array.isArray(a) && a.length) return a; } catch {} return CATALOG_DEFAULT; }
+function cleanCat(a, depth, box) {
+  return (Array.isArray(a) ? a : []).slice(0, 400).map((n) => {
+    if (!n || box.n++ > 6000) return null;
+    const name = clean(n.n, 120); if (!name) return null;
+    return { n: name, f: depth < 7 ? cleanCat(n.f, depth + 1, box) : [], i: (Array.isArray(n.i) ? n.i : []).slice(0, 600).map((x) => (box.n++, { n: clean(x && x.n, 200), m: money(x && x.m), l: money(x && x.l) })).filter((x) => x.n) };
+  }).filter(Boolean);
+}
 async function pricebook(env) { const v = await getSet(env, 'pricebook'); try { const a = JSON.parse(v); if (Array.isArray(a) && a.length) return a; } catch {} return PB_DEFAULT; }
 const ADMIN_SEED = { v: '1', pw: 'seed1:0474a7f04aa063d8071c0ec58252995127ae3dd7f0ab13e339816b3db2a57cb0' };
 let qready = false;
@@ -458,7 +467,7 @@ async function admin(path, req, env) {
     const projects = (await env.DB.prepare('SELECT id, email, title, kind, status, details, created, updated, extra FROM projects ORDER BY updated DESC LIMIT 2000').all()).results;
     const messages = (await env.DB.prepare('SELECT id, email, project_id, sender, body, created, seen_muir FROM messages ORDER BY id DESC LIMIT 5000').all()).results;
     const quotes = (await env.DB.prepare('SELECT project_id, lines, status, notes, updated FROM quotes').all()).results;
-    return json({ ok: true, me: email, users, projects, messages, quotes, pricebook: await pricebook(env), emailOn: emailOn(env), textOn: textOn(env) });
+    return json({ ok: true, me: email, users, projects, messages, quotes, pricebook: await pricebook(env), catalog: await catalog(env), emailOn: emailOn(env), textOn: textOn(env) });
   }
   let d; try { d = await req.json(); } catch { return bad('Bad request'); }
   const cust = String(d.email || '').toLowerCase().trim();
@@ -483,6 +492,12 @@ async function admin(path, req, env) {
     await env.DB.prepare('UPDATE projects SET updated=? WHERE id=?').bind(now, pid).run();
     if (d.tell && st !== 'draft' && (!old || old.status !== st)) { const t = totals(lines); await notifyCustomer(env, p.email, (st === 'sent' ? 'Your quote ' : st === 'invoiced' ? 'Your bill ' : 'Your quote ') + pnum(pid) + ' for "' + p.title + '" is ready: $' + t.t.toFixed(2) + '. See it in your account.', p.title); }
     return json({ ok: true });
+  }
+  if (path === '/api/admin/catalog') {
+    const c = cleanCat(d.catalog, 0, { n: 0 }); const t = JSON.stringify(c);
+    if (!c.length) return json({ ok: false, error: 'The catalog is empty.' });
+    if (t.length > 900000) return json({ ok: false, error: 'The catalog is too big to save.' });
+    await putSet(env, 'catalog', t); return json({ ok: true });
   }
   if (path === '/api/admin/pricebook') {
     const pb = (Array.isArray(d.items) ? d.items : []).slice(0, 300).map((x, i) => ({ key: clean(x.key, 40) || 'item-' + i, group: clean(x.group, 40) || 'General', desc: clean(x.desc, 200), m: money(x.m), l: money(x.l) })).filter((x) => x.desc);
