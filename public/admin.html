@@ -249,7 +249,22 @@ html:has(#theme option[value="light"]:checked) .nav a.l{color:var(--ink)}
 .adm .gatef{max-width:460px}@media(max-width:700px){.adm .qt td:nth-child(2),.adm .qt td:nth-child(3){width:86px}}</style><style id="pbcss">.adm .qt textarea{min-height:46px;resize:vertical;overflow:hidden;line-height:1.4}
 .adm .qt .rm{width:auto!important;padding:0 12px;white-space:nowrap;font-size:14px!important}
 .adm .pbt td:nth-child(1){width:170px}.adm .pbt td:nth-child(2){width:auto}.adm .pbt td:nth-child(3),.adm .pbt td:nth-child(4){width:120px}.adm .pbt td:nth-child(5){width:110px}
-@media(max-width:800px){.adm .pbt,.adm .pbt tbody,.adm .pbt tr,.adm .pbt td{display:block;width:auto!important}.adm .pbt thead{display:none}.adm .pbt tr{border:1px solid rgba(255,255,255,.2);border-radius:10px;padding:8px;margin:0 0 10px}}</style><style id="ajcss">.adm .addjob{margin-bottom:16px}.adm .ajgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px 14px;align-items:end}.adm .ajgrid .wide{grid-column:1/-1}.adm .ajgrid label{margin-top:4px}.adm .ajgrid #aDe{min-height:170px}.adm .ajgrid textarea.short{min-height:70px}@media(max-width:900px){.adm .ajgrid{grid-template-columns:1fr 1fr}}@media(max-width:560px){.adm .ajgrid{grid-template-columns:1fr}}</style></head>
+@media(max-width:800px){.adm .pbt,.adm .pbt tbody,.adm .pbt tr,.adm .pbt td{display:block;width:auto!important}.adm .pbt thead{display:none}.adm .pbt tr{border:1px solid rgba(255,255,255,.2);border-radius:10px;padding:8px;margin:0 0 10px}}</style><style id="ajcss">.adm .addjob{margin-bottom:16px}.adm .ajgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px 14px;align-items:end}.adm .ajgrid .wide{grid-column:1/-1}.adm .ajgrid label{margin-top:4px}.adm .ajgrid #aDe{min-height:170px}.adm .ajgrid textarea.short{min-height:70px}@media(max-width:900px){.adm .ajgrid{grid-template-columns:1fr 1fr}}@media(max-width:560px){.adm .ajgrid{grid-template-columns:1fr}}</style><style id="msgcss">.adm .msgr{display:grid;grid-template-columns:330px 1fr;gap:0;padding:0!important;overflow:hidden;height:min(640px,78vh);margin-bottom:16px}
+.adm .mside{border-right:1px solid rgba(255,255,255,.15);display:flex;flex-direction:column;min-height:0;position:relative}.adm .mtop{display:flex;align-items:center;gap:8px;padding:12px 12px 8px}.adm .mtop h2{margin:0;flex:1}.adm .mtop b{flex:1}
+.adm .imp{font-size:12px!important;padding:8px 10px!important;min-height:0!important;cursor:pointer}.adm .pen{width:40px;height:40px;border-radius:50%;border:1px solid var(--gold);background:none;color:var(--gold);font-size:19px;cursor:pointer}
+.adm .mside>input,.adm .mnew>input{margin:0 12px 8px;width:calc(100% - 24px);border-radius:20px;padding:9px 14px}
+.adm .mlist{overflow:auto;flex:1;min-height:0}.adm .mrow{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;background:none;border:0;border-bottom:1px solid rgba(255,255,255,.07);color:var(--ink);font:inherit;text-align:left;cursor:pointer;position:relative}
+.adm .mrow.on{background:rgba(42,143,176,.25)}.adm .mrow:hover{background:rgba(255,255,255,.05)}.adm .mrow .tx{flex:1;min-width:0}.adm .mrow .tx b,.adm .mrow .tx small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.adm .mrow small{color:var(--mut);font-size:14px}
+.adm .mrow .tm{font-size:12px;color:var(--mut);align-self:flex-start}.adm .ub{position:absolute;right:12px;bottom:12px;background:#0a84ff;color:#fff;border-radius:10px;font:700 12px/20px sans-serif;min-width:20px;text-align:center;padding:0 5px}
+.adm .av{width:40px;height:40px;flex:none;border-radius:50%;background:linear-gradient(#8e8e93,#5d5d63);color:#fff;display:grid;place-items:center;font:700 15px sans-serif}.adm .av.big{width:46px;height:46px}
+.adm .mnew{position:absolute;inset:0;background:#0b1418;display:flex;flex-direction:column;z-index:2}
+.adm .mpane{display:flex;flex-direction:column;min-height:0}.adm .mhd{display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.15)}.adm .mhd>div{flex:1;min-width:0}.adm .mhd b,.adm .mhd small{display:block}.adm .mhd small{color:var(--mut)}
+.adm .mth{flex:1;overflow:auto;padding:12px 16px;display:flex;flex-direction:column;gap:6px}.adm .mth .day{align-self:center;font-size:12px;color:var(--mut);margin:8px 0 2px}
+.adm .bb{max-width:72%;padding:9px 13px;border-radius:19px;white-space:pre-wrap;word-wrap:break-word;line-height:1.35;font-size:16px}.adm .bb.out{align-self:flex-end;background:#0a84ff;color:#fff;border-bottom-right-radius:6px}.adm .bb.in{align-self:flex-start;background:#3a3a3c;color:#fff;border-bottom-left-radius:6px}
+.adm .bb time{display:block;font-size:11px;opacity:.7;margin-top:3px;text-align:right}.adm .bb .tag{display:block;font-size:11px;font-weight:700;opacity:.85;margin-bottom:2px}
+.adm .mcomp{display:flex;gap:8px;align-items:flex-end;padding:10px 12px;border-top:1px solid rgba(255,255,255,.15)}.adm .mcomp select{width:auto;max-width:190px;font-size:14px;padding:8px}.adm .mcomp textarea{flex:1;border-radius:20px;padding:9px 14px;min-height:40px;resize:none;overflow:hidden}
+.adm .mcomp .send{width:38px;height:38px;flex:none;border-radius:50%;border:0;background:#0a84ff;color:#fff;font:700 20px/1 sans-serif;cursor:pointer}.adm .hint{font-size:12px;margin:0 14px 10px}.adm .pad{padding:14px}
+@media(max-width:800px){.adm .msgr{grid-template-columns:1fr;height:auto}.adm .mside{max-height:320px;border-right:0;border-bottom:1px solid rgba(255,255,255,.15)}.adm .mpane{min-height:420px}.adm .mcomp{flex-wrap:wrap}.adm .mcomp select{max-width:100%;width:100%}}</style></head>
 <body>
 <div class="wrap">
 <a class="skip" href="#main">Skip to main content</a>
@@ -292,6 +307,13 @@ html:has(#theme option[value="light"]:checked) .nav a.l{color:var(--ink)}
 <div id="aBody" hidden>
 <div class="row" style="justify-content:flex-end;margin:0 0 10px"><button type="button" class="key k2" id="bLock">Lock owner page</button></div>
 <div class="stats" id="stats"></div>
+<section class="glass pane msgr" id="msgr" aria-label="Messages">
+<div class="mside"><div class="mtop"><h2>Messages</h2><label class="key k2 imp" title="Import contacts from your iPhone or Mac (.vcf)">Import contacts<input type="file" id="mVcf" accept=".vcf,text/vcard" hidden></label><button type="button" class="pen" id="mPen" aria-label="New message" title="New message">✎</button></div>
+<input id="mFind" placeholder="Search" aria-label="Search conversations"><div id="mList" class="mlist"></div>
+<div id="mNew" class="mnew" hidden><div class="mtop"><b>New message</b><button type="button" class="key k2" id="mNewX">Cancel</button></div><input id="mNewQ" placeholder="To: name, phone or email" aria-label="To"><div id="mNewL" class="mlist"></div></div></div>
+<div class="mpane" id="mPane"></div>
+</section>
+
 <div class="cols">
 <div><input id="find" placeholder="Find a customer" aria-label="Find a customer"><div id="list" style="margin-top:10px"></div>
 
@@ -405,7 +427,40 @@ function gate(){var g=$('gate');g.hidden=false;$('aBody').hidden=true;api('/api/
  if(fg)fg.onclick=function(){fg.disabled=true;api('/api/adminpw/forgot',{}).then(function(x){fg.disabled=false;if(!x.ok)return say(x.error);
   f.innerHTML='';f.appendChild(el('h2','','Reset your password'));f.appendChild(el('p','muted','We emailed a 6-digit code to '+x.to+'.'));var cd=el('input');cd.placeholder='6-digit code';cd.inputMode='numeric';cd.setAttribute('aria-label','Code');var np=el('input');np.type='password';np.autocomplete='new-password';np.placeholder='New password (4+ characters)';np.setAttribute('aria-label','New password');np.style.marginTop='10px';f.appendChild(cd);f.appendChild(np);var rr=el('div','row');var bb=el('button','key k1','Save new password');bb.type='submit';rr.appendChild(bb);f.appendChild(rr);f.appendChild(m);
   f.onsubmit=function(e){e.preventDefault();bb.disabled=true;api('/api/adminpw/reset',{code:cd.value,password:np.value}).then(function(y){bb.disabled=false;if(!y.ok)return say(y.error);g.hidden=true;load()})}})}})}
-function render(){var q=$('find').value.toLowerCase(),L=$('list');L.innerHTML='';
+var CH={who:null,q:''};
+function cname(u){return u?(u.name||(/@no-email\.muirtech\.net$/.test(u.email)?u.phone:u.email)):''}
+function initials(u){var n=cname(u)||'?';var p=n.replace(/[^A-Za-z0-9 ]/g,' ').trim().split(/\s+/);return ((p[0]||'?')[0]+(p[1]?p[1][0]:'')).toUpperCase()}
+function chatRender(){var wrap=$('msgr');if(!wrap||!D)return;var list=$('mList'),q=CH.q.toLowerCase();list.innerHTML='';
+ var last={},unread={};D.messages.forEach(function(m){if(!last[m.email]||m.id>last[m.email].id)last[m.email]=m;if(m.sender==='customer'&&!m.seen_muir)unread[m.email]=(unread[m.email]||0)+1});
+ var us=D.users.slice().sort(function(a,b){return ((last[b.email]||{}).created||0)-((last[a.email]||{}).created||0)});
+ us.filter(function(u){return (last[u.email]||u.email===CH.who||q)&&(!q||(u.email+' '+(u.name||'')+' '+(u.phone||'')).toLowerCase().indexOf(q)>=0)}).forEach(function(u){
+  var b=el('button','mrow'+(u.email===CH.who?' on':''));b.type='button';var av=el('span','av',initials(u));b.appendChild(av);var tx=el('span','tx');tx.appendChild(el('b','',cname(u)));var lm=last[u.email];tx.appendChild(el('small','',lm?(lm.sender==='muir'?'You: ':'')+lm.body.slice(0,60):'No messages yet'));b.appendChild(tx);
+  var tm=el('span','tm',lm?ago(lm.created):'');b.appendChild(tm);if(unread[u.email]){var d=el('span','ub',unread[u.email]);b.appendChild(d)}
+  b.onclick=function(){CH.who=u.email;chatRender();api('/api/admin/seen',{email:u.email}).then(function(){D.messages.forEach(function(m){if(m.email===u.email)m.seen_muir=1});render()})};list.appendChild(b)});
+ if(!list.children.length)list.appendChild(el('p','muted pad','No conversations yet. Tap the pencil to start one.'));
+ var pane=$('mPane');pane.innerHTML='';var u=D.users.filter(function(x){return x.email===CH.who})[0];
+ if(!u){pane.appendChild(el('p','muted pad','Pick a conversation, or tap the pencil to message any customer.'));return}
+ var hd=el('div','mhd');hd.appendChild(el('span','av big',initials(u)));var ht=el('div');ht.appendChild(el('b','',cname(u)));ht.appendChild(el('small','',[/@no-email/.test(u.email)?'':u.email,u.phone].filter(Boolean).join(' · ')+(u.notify==='text'?' · prefers texts':u.notify==='both'?' · email + text':'')));hd.appendChild(ht);
+ var op=el('button','key k2','Open customer');op.type='button';op.onclick=function(){cur=u.email;render();$('detail').scrollIntoView({behavior:'smooth'})};hd.appendChild(op);pane.appendChild(hd);
+ var th=el('div','mth');var ms=D.messages.filter(function(m){return m.email===u.email}).sort(function(a,b){return a.id-b.id});var lastDay='';
+ ms.forEach(function(m){var day=new Date(m.created).toDateString();if(day!==lastDay){th.appendChild(el('p','day',new Date(m.created).toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'})));lastDay=day}
+  var bb=el('div','bb '+(m.sender==='muir'?'out':'in'));if(m.project_id){var pj=D.projects.filter(function(p){return p.id===m.project_id})[0];bb.appendChild(el('span','tag',pnum(m.project_id)+(pj?' · '+pj.title:'')))}bb.appendChild(document.createTextNode(m.body));bb.appendChild(el('time','',new Date(m.created).toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'})));th.appendChild(bb)});
+ if(!ms.length)th.appendChild(el('p','muted pad','No messages yet. Say hello below.'));pane.appendChild(th);setTimeout(function(){th.scrollTop=th.scrollHeight},0);
+ var f=el('form','mcomp');var js=el('select');js.setAttribute('aria-label','About which job');var o=el('option','','General');o.value='';js.appendChild(o);D.projects.filter(function(p){return p.email===u.email}).forEach(function(p){var o2=el('option','',pnum(p.id)+' · '+p.title);o2.value=p.id;js.appendChild(o2)});
+ var ta=el('textarea');ta.rows=1;ta.placeholder='Message';ta.setAttribute('aria-label','Message');grow(ta);var sb=el('button','send','↑');sb.type='submit';sb.setAttribute('aria-label','Send');
+ ta.onkeydown=function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();f.requestSubmit()}};
+ f.appendChild(js);f.appendChild(ta);f.appendChild(sb);pane.appendChild(f);pane.appendChild(el('p','muted hint','Goes to their account and their email'+(D.textOn?', and by text if they chose texts':'')+'. Enter sends, Shift+Enter adds a line.'));
+ f.onsubmit=function(e){e.preventDefault();var t=ta.value.trim();if(!t)return;sb.disabled=true;api('/api/admin/message',{email:u.email,projectId:js.value?Number(js.value):null,body:t}).then(function(r){sb.disabled=false;if(!r.ok){alert(r.error);return}ta.value='';load()})}}
+function ago(ms){var d=new Date(ms),n=new Date();return d.toDateString()===n.toDateString()?d.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'}):d.toLocaleDateString(undefined,{month:'short',day:'numeric'})}
+function newChat(){var dlg=$('mNew');dlg.hidden=false;var inp=$('mNewQ');inp.value='';inp.focus();pick()}
+function pick(){var q=$('mNewQ').value.toLowerCase().trim(),L=$('mNewL');L.innerHTML='';
+ D.users.filter(function(u){return !q||(u.email+' '+(u.name||'')+' '+(u.phone||'')).toLowerCase().indexOf(q)>=0}).slice(0,60).forEach(function(u){var b=el('button','mrow');b.type='button';b.appendChild(el('span','av',initials(u)));var tx=el('span','tx');tx.appendChild(el('b','',cname(u)));tx.appendChild(el('small','',[/@no-email/.test(u.email)?'':u.email,u.phone].filter(Boolean).join(' · ')));b.appendChild(tx);b.onclick=function(){$('mNew').hidden=true;CH.who=u.email;chatRender()};L.appendChild(b)});
+ if(/^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(q)&&!D.users.some(function(u){return u.email===q})){var b=el('button','mrow');b.type='button';b.appendChild(el('span','av','+'));var tx=el('span','tx');tx.appendChild(el('b','','New: '+q));b.appendChild(tx);b.onclick=function(){D.users.push({email:q,name:'',phone:''});$('mNew').hidden=true;CH.who=q;chatRender()};L.insertBefore(b,L.firstChild)}}
+function vcf(text){var out=[];text.split(/END:VCARD/i).forEach(function(card){if(!/BEGIN:VCARD/i.test(card))return;card=card.replace(/\r?\n[ \t]/g,'');var c={};card.split(/\r?\n/).forEach(function(line){var i=line.indexOf(':');if(i<0)return;var k=line.slice(0,i).toUpperCase(),v=line.slice(i+1).trim();
+  if(/^FN/.test(k)&&!c.name)c.name=v;else if(/^N[;:]?/.test(k)&&!/^NOTE|^NICK/.test(k)&&!c.name){var p=v.split(';');c.name=((p[1]||'')+' '+(p[0]||'')).trim()}
+  else if(/^(ITEM\d+\.)?EMAIL/.test(k)&&!c.email)c.email=v;else if(/^(ITEM\d+\.)?TEL/.test(k)&&!c.phone)c.phone=v;else if(/^(ITEM\d+\.)?ADR/.test(k)&&!c.address)c.address=v.split(';').filter(Boolean).join(', ')});
+ if(c.email||c.phone)out.push(c)});return out}
+function render(){chatRender();var q=$('find').value.toLowerCase(),L=$('list');L.innerHTML='';
  var unread={};D.messages.forEach(function(m){if(m.sender==='customer'&&!m.seen_muir)unread[m.email]=(unread[m.email]||0)+1});
  var st=$('stats');st.innerHTML='';[['Customers',D.users.length],['Open jobs',D.projects.filter(function(p){return p.status!=='Done'}).length],['Unread messages',Object.keys(unread).reduce(function(a,k){return a+unread[k]},0)]].forEach(function(x){var d=el('div');d.appendChild(el('b','',x[1]));d.appendChild(document.createTextNode(x[0]));st.appendChild(d)});
  D.users.slice().sort(function(a,b){return (unread[b.email]||0)-(unread[a.email]||0)}).filter(function(u){return !q||(u.email+' '+(u.name||'')).toLowerCase().indexOf(q)>=0}).forEach(function(u){var b=el('button','cust'+(u.email===cur?' on':''));b.type='button';b.appendChild(el('b','',u.name||u.email));b.appendChild(el('small','',u.email+(u.phone?' · '+u.phone:'')));if(unread[u.email])b.appendChild(el('span','dot',unread[u.email]));b.onclick=function(){cur=u.email;api('/api/admin/seen',{email:u.email});D.messages.forEach(function(m){if(m.email===u.email)m.seen_muir=1});render();detail()};L.appendChild(b)});
@@ -420,6 +475,8 @@ function detail(){var u=D.users.filter(function(x){return x.email===cur})[0],box
 function load(keep){api('/api/admin').then(function(r){if(!r.ok){if(r.locked)return gate();$('aMsg').hidden=false;$('aMsg').innerHTML='';$('aMsg').appendChild(document.createTextNode(r.error+' '));var a=el('a','','Sign in');a.href='/account?ret=/admin';$('aMsg').appendChild(a);return}
  D=r;PB=r.pricebook||[];QS={};(r.quotes||[]).forEach(function(q){QS[q.project_id]=q});$('gate').hidden=true;$('aBody').hidden=false;cur=keep||cur;var y=window.scrollY;render();var pb=$('pbBox');pb.innerHTML='';pb.appendChild(pbEditor());window.scrollTo(0,y)})}
 $('bLock').onclick=function(){api('/api/adminpw/lock',{}).then(function(){location.reload()})};
+$('mFind').oninput=function(){CH.q=this.value;chatRender()};$('mPen').onclick=newChat;$('mNewX').onclick=function(){$('mNew').hidden=true};$('mNewQ').oninput=pick;
+$('mVcf').onchange=function(){var f=this.files[0];if(!f)return;f.text().then(function(t){var c=vcf(t);if(!c.length){alert('No contacts with an email or phone were found in that file.');return}if(!confirm('Add '+c.length+' contacts to your customer list?'))return;api('/api/admin/contacts',{contacts:c}).then(function(r){alert(r.ok?'Added '+r.added+' contacts.':r.error);load()})});this.value=''};
 $('find').oninput=render;
 $('fAdd').onsubmit=function(e){e.preventDefault();var em=$('aEm').value,ms=$('aMs').value.trim();api('/api/admin/project',{email:em,title:$('aTi').value,kind:$('aKi').value,status:$('aSt').value,details:$('aDe').value}).then(function(r){if(r.ok&&ms){api('/api/admin/message',{email:em,projectId:r.id,body:ms});$('aMs').value=''}var m=$('addMsg');m.hidden=false;m.className='msg '+(r.ok?'good':'bad');m.textContent=r.ok?'Added.':r.error;if(r.ok){cur=$('aEm').value.toLowerCase().trim();$('fAdd').reset();$('aSt').value='Scheduled';load(cur)}})};
 load();

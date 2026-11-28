@@ -216,9 +216,10 @@ async function notifyCustomer(env, email, text, projectTitle) {
   const where = projectTitle ? ' about "' + projectTitle + '"' : '';
   const link = 'https://muirtech.net/account';
   const tasks = [];
-  if (u.notify !== 'text') tasks.push(sendEmail(env, email, 'New message from MUIR Tech' + where, `MUIR Tech sent you a message${where}:\n\n${text}\n\nSee it and reply: ${link}`,
+  const noEmail = /@no-email\.muirtech\.net$/.test(email);
+  if (u.notify !== 'text' && !noEmail) tasks.push(sendEmail(env, email, 'New message from MUIR Tech' + where, `MUIR Tech sent you a message${where}:\n\n${text}\n\nSee it and reply: ${link}`,
     `<div style="font:16px/1.5 system-ui,sans-serif"><p>MUIR Tech sent you a message${esc(where)}:</p><blockquote style="border-left:3px solid #C3AF75;margin:0;padding:6px 12px">${esc(text).replace(/\n/g, '<br>')}</blockquote><p><a href="${link}">See it and reply</a></p></div>`));
-  if ((u.notify === 'text' || u.notify === 'both') && u.phone) tasks.push(sendText(env, u.phone, 'MUIR Tech' + where + ': ' + text.slice(0, 400) + ' — reply at muirtech.net/account'));
+  if ((u.notify === 'text' || u.notify === 'both' || noEmail) && u.phone) tasks.push(sendText(env, u.phone, 'MUIR Tech' + where + ': ' + text.slice(0, 400) + ' — reply at muirtech.net/account'));
   await Promise.all(tasks);
 }
 async function portal(path, req, env) {
@@ -487,8 +488,19 @@ async function admin(path, req, env) {
     const pb = (Array.isArray(d.items) ? d.items : []).slice(0, 300).map((x, i) => ({ key: clean(x.key, 40) || 'item-' + i, group: clean(x.group, 40) || 'General', desc: clean(x.desc, 200), m: money(x.m), l: money(x.l) })).filter((x) => x.desc);
     await putSet(env, 'pricebook', JSON.stringify(pb)); return json({ ok: true });
   }
+  if (path === '/api/admin/contacts') {
+    const now = Date.now(); let n = 0;
+    for (const c of (Array.isArray(d.contacts) ? d.contacts : []).slice(0, 2000)) {
+      const name = clean(c.name, 100), phone = clean(c.phone, 30); let em = clean(c.email, 190).toLowerCase();
+      if (!okEmail(em)) { if (phone.replace(/\D/g, '').length < 10) continue; em = 'phone-' + phone.replace(/\D/g, '') + '@no-email.muirtech.net'; }
+      await env.DB.prepare("INSERT OR IGNORE INTO users (email, created, last_in, notify) VALUES (?,?,0,'email')").bind(em, now).run();
+      await env.DB.prepare("UPDATE users SET name=COALESCE(NULLIF(name,''),?), phone=COALESCE(NULLIF(phone,''),?), address=COALESCE(NULLIF(address,''),?) WHERE email=?").bind(name, phone, clean(c.address, 200), em).run(); n++;
+    }
+    return json({ ok: true, added: n });
+  }
   if (path === '/api/admin/message') {
     const body = clean(d.body, 4000); if (!okEmail(cust) || !body) return bad('Customer and message are needed.');
+    await env.DB.prepare("INSERT OR IGNORE INTO users (email, created, last_in, notify) VALUES (?,?,0,'email')").bind(cust, Date.now()).run();
     const pid = d.projectId ? Number(d.projectId) : null; let title = '';
     if (pid) { const p = await env.DB.prepare('SELECT title FROM projects WHERE id=? AND email=?').bind(pid, cust).first(); title = p ? p.title : ''; }
     const now = Date.now();
