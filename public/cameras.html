@@ -262,7 +262,7 @@ html:has(#theme option[value="light"]:checked) .nav a.l{color:var(--ink)}
 @media (prefers-reduced-motion:reduce){.camarray .head,.camarray .lens i,.camarray .led{animation:none}}
 .brands{grid-template-columns:repeat(auto-fit,minmax(min(230px,100%),1fr))}
 </style>
-</head>
+<style id="camgal">.camgal{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(200px,100%),1fr));gap:14px;margin:6px 0 26px}.camgal figure{margin:0;border-radius:16px;overflow:hidden;border:1px solid var(--line,rgba(255,255,255,.15));background:#0b1418}.camgal img{display:block;width:100%;aspect-ratio:1/1;object-fit:cover}.camgal figcaption{padding:10px 12px;font-size:15px;line-height:1.3;color:var(--ink,#eee)}</style></head>
 <body>
 <div class="wrap">
 <a class="skip" href="#main">Skip to main content</a>
@@ -278,7 +278,7 @@ html:has(#theme option[value="light"]:checked) .nav a.l{color:var(--ink)}
 <section class="whero" aria-labelledby="wh">
 <div class="glow" aria-hidden="true"></div>
 <p class="eyebrow">Security cameras &middot; Wolfeboro, NH, Lakes Region</p>
-<h1 id="wh">See your home from anywhere <span class="it">with cameras set up right.</span></h1>
+<h1 id="wh">See your home from anywhere <span class="it">with cameras and alarms set up right.</span></h1>
 <div class="camarray" aria-hidden="true">
 <div class="rail"></div>
 <div class="cam c1"><div class="arm"></div><div class="head"><div class="cone"></div><div class="body"><div class="hood"></div><div class="lens"><i></i></div><div class="led"></div></div></div></div>
@@ -286,7 +286,14 @@ html:has(#theme option[value="light"]:checked) .nav a.l{color:var(--ink)}
 <div class="cam c3"><div class="arm"></div><div class="head"><div class="cone"></div><div class="body"><div class="hood"></div><div class="lens"><i></i></div><div class="led"></div></div></div></div>
 <div class="scan"></div>
 </div>
-<p class="lead">We install and set up security cameras and video doorbells for homes, camps and businesses around the lake. Mounted, powered, on your Wi-Fi and working on your phone, with alerts that matter and no false alarms every time a leaf blows by.</p>
+<p class="lead">We install and set up security cameras, video doorbells and home alarm systems for homes, camps and businesses around the lake. Mounted, powered, on your Wi-Fi and working on your phone, with alerts that matter and no false alarms every time a leaf blows by.</p>
+<div class="camgal">
+<figure><img src="IMAGES/MUIR%20TECH%20PHOTO%2014.jpg" alt="Home alarm kit: central hub, keypad, motion sensor and door and window sensors"><figcaption>Alarm hub, keypad and door &amp; window sensors</figcaption></figure>
+<figure><img src="IMAGES/MUIR%20TECH%20PHOTO%2015.jpg" alt="Black floodlight security camera"><figcaption>Floodlight cameras</figcaption></figure>
+<figure><img src="IMAGES/MUIR%20TECH%20PHOTO%2016.jpg" alt="White floodlight security camera with lights on"><figcaption>Lights that turn on when someone walks up</figcaption></figure>
+<figure><img src="IMAGES/MUIR%20TECH%20PHOTO%2012.jpg?v=2" alt="White outdoor camera under the eaves"><figcaption>Outdoor cameras</figcaption></figure>
+<figure><img src="IMAGES/MUIR%20TECH%20PHOTO%2013.jpg" alt="Black 4K plug-in camera"><figcaption>Indoor &amp; plug-in cameras</figcaption></figure>
+</div>
 <div style="display:flex;flex-wrap:wrap;gap:16px">
 <a class="key k1" href="#start">Get a quote</a>
 <a class="key k2" href="#brands">Brands we install</a>
@@ -299,7 +306,9 @@ html:has(#theme option[value="light"]:checked) .nav a.l{color:var(--ink)}
 <ul class="cards">
 <li class="glass"><h3>Plan the coverage</h3><p>We walk your property and pick the spots that cover doors, driveways, docks and sheds, without pointing at the neighbors.</p></li>
 <li class="glass"><h3>Mount &amp; power</h3><p>Wired, plug-in, battery or solar. Cameras mounted solid and level, with cables run neatly and weather-sealed.</p></li>
-<li class="glass"><h3>Video doorbells</h3><p>See and talk to whoever is at the door from your phone. We swap your old doorbell and test the chime.</p></li>
+<li class="glass"><h3>Doorbell cameras</h3><p>See, hear and talk to whoever is at the door from your phone, home or away. We swap your old doorbell, wire it up and test the chime.</p></li>
+<li class="glass"><h3>Alarm hub &amp; sensors</h3><p>A central hub with a keypad, plus sensors on doors, windows and any other openings. Cameras, sensors and alarm all run from one mobile app.</p></li>
+<li class="glass"><h3>24/7 monitoring</h3><p>Want someone watching when you can't? We set up the camera company's monitoring plan so professionals keep an eye on your place 24 hours a day and can send help.</p></li>
 <li class="glass"><h3>Wi-Fi that reaches</h3><p>Cameras far from the router? We extend your Wi-Fi so every camera stays connected, even out by the water.</p></li>
 <li class="glass"><h3>App &amp; alerts</h3><p>Set up on your phone with smart alerts for people, cars and packages, plus the right recording and storage plan.</p></li>
 <li class="glass"><h3>Seasonal &amp; camps</h3><p>Keep an eye on a summer place all winter: freeze, power and motion alerts so you know before there's a problem.</p></li>
@@ -328,7 +337,7 @@ html:has(#theme option[value="light"]:checked) .nav a.l{color:var(--ink)}
 <p class="sub">Check what fits. It only takes a minute and helps us give you a clear quote.</p>
 <div class="start glass">
 <fieldset><legend>Where are the cameras going?</legend><div class="opts"><label><input type="checkbox" name="where" value="Home"> Home</label><label><input type="checkbox" name="where" value="Camp or second home"> Camp or second home</label><label><input type="checkbox" name="where" value="Business"> Business</label></div></fieldset>
-<fieldset><legend>What do you need?</legend><div class="opts"><label><input type="checkbox" name="need" value="Outdoor cameras"> Outdoor cameras</label><label><input type="checkbox" name="need" value="Indoor cameras"> Indoor cameras</label><label><input type="checkbox" name="need" value="Video doorbell"> Video doorbell</label><label><input type="checkbox" name="need" value="Floodlight camera"> Floodlight camera</label><label><input type="checkbox" name="need" value="Better Wi-Fi outside"> Better Wi-Fi outside</label></div></fieldset>
+<fieldset><legend>What do you need?</legend><div class="opts"><label><input type="checkbox" name="need" value="Outdoor cameras"> Outdoor cameras</label><label><input type="checkbox" name="need" value="Indoor cameras"> Indoor cameras</label><label><input type="checkbox" name="need" value="Video doorbell"> Video doorbell</label><label><input type="checkbox" name="need" value="Alarm hub and door/window sensors"> Alarm hub and door/window sensors</label><label><input type="checkbox" name="need" value="24/7 monitoring plan"> 24/7 monitoring plan</label><label><input type="checkbox" name="need" value="Floodlight camera"> Floodlight camera</label><label><input type="checkbox" name="need" value="Better Wi-Fi outside"> Better Wi-Fi outside</label></div></fieldset>
 <fieldset><legend>How many cameras?</legend><div class="opts"><label><input type="radio" name="count" value="1 to 2"> 1 to 2</label><label><input type="radio" name="count" value="3 to 5"> 3 to 5</label><label><input type="radio" name="count" value="6 or more"> 6 or more</label><label><input type="radio" name="count" value="Not sure"> Not sure</label></div></fieldset>
 <fieldset><legend>Do you have the cameras yet?</legend><div class="opts"><label><input type="radio" name="have" value="Yes, already bought"> Yes, already bought</label><label><input type="radio" name="have" value="No, help me choose"> No, help me choose</label></div></fieldset>
 </div>
