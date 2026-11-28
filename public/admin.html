@@ -249,7 +249,7 @@ html:has(#theme option[value="light"]:checked) .nav a.l{color:var(--ink)}
 .adm .gatef{max-width:460px}@media(max-width:700px){.adm .qt td:nth-child(2),.adm .qt td:nth-child(3){width:86px}}</style><style id="pbcss">.adm .qt textarea{min-height:46px;resize:vertical;overflow:hidden;line-height:1.4}
 .adm .qt .rm{width:auto!important;padding:0 12px;white-space:nowrap;font-size:14px!important}
 .adm .pbt td:nth-child(1){width:170px}.adm .pbt td:nth-child(2){width:auto}.adm .pbt td:nth-child(3),.adm .pbt td:nth-child(4){width:120px}.adm .pbt td:nth-child(5){width:110px}
-@media(max-width:800px){.adm .pbt,.adm .pbt tbody,.adm .pbt tr,.adm .pbt td{display:block;width:auto!important}.adm .pbt thead{display:none}.adm .pbt tr{border:1px solid rgba(255,255,255,.2);border-radius:10px;padding:8px;margin:0 0 10px}}</style></head>
+@media(max-width:800px){.adm .pbt,.adm .pbt tbody,.adm .pbt tr,.adm .pbt td{display:block;width:auto!important}.adm .pbt thead{display:none}.adm .pbt tr{border:1px solid rgba(255,255,255,.2);border-radius:10px;padding:8px;margin:0 0 10px}}</style><style id="ajcss">.adm .addjob{margin-bottom:16px}.adm .ajgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px 14px;align-items:end}.adm .ajgrid .wide{grid-column:1/-1}.adm .ajgrid label{margin-top:4px}.adm .ajgrid #aDe{min-height:170px}.adm .ajgrid textarea.short{min-height:70px}@media(max-width:900px){.adm .ajgrid{grid-template-columns:1fr 1fr}}@media(max-width:560px){.adm .ajgrid{grid-template-columns:1fr}}</style></head>
 <body>
 <div class="wrap">
 <a class="skip" href="#main">Skip to main content</a>
@@ -294,9 +294,18 @@ html:has(#theme option[value="light"]:checked) .nav a.l{color:var(--ink)}
 <div class="stats" id="stats"></div>
 <div class="cols">
 <div><input id="find" placeholder="Find a customer" aria-label="Find a customer"><div id="list" style="margin-top:10px"></div>
-<div class="glass pane" style="margin-top:12px"><h2>Add a job for a customer</h2><form id="fAdd"><label for="aEm">Customer email</label><input id="aEm" type="email" required><label for="aTi">Job name</label><input id="aTi" required><label for="aKi">Kind</label><select id="aKi"></select><label for="aSt">Status</label><input id="aSt" value="Scheduled"><label for="aDe">Details</label><textarea id="aDe"></textarea><div class="row"><button class="key k1" type="submit">Add job</button></div><p class="msg" id="addMsg" hidden></p></form></div>
+
 </div>
-<div id="detail"><div class="glass pane"><p class="muted">Pick a customer on the left.</p></div></div>
+<div class="glass pane addjob"><h2>Add a job for a customer</h2><form id="fAdd" class="ajgrid">
+<div><label for="aEm">Customer email</label><input id="aEm" type="email" required></div>
+<div><label for="aTi">Job name</label><input id="aTi" required></div>
+<div><label for="aKi">Kind</label><select id="aKi"></select></div>
+<div><label for="aSt">Status</label><input id="aSt" value="Scheduled"></div>
+<div class="wide"><label for="aDe">Details</label><textarea id="aDe" placeholder="What needs doing, where, parts, notes..."></textarea></div>
+<div class="wide"><label for="aMs">Message to the customer (optional)</label><textarea id="aMs" class="short" placeholder="Shows in their account and goes to their email, and by text if they chose texts."></textarea></div>
+<div class="wide row" style="margin:0"><button class="key k1" type="submit">Add job</button><p class="msg" id="addMsg" hidden style="margin:0"></p></div>
+</form></div>
+<div id="detail"><div class="glass pane"><p class="muted">Pick a customer on the left to see their jobs, quotes and messages.</p></div></div>
 </div></div>
 <div id="pbBox" style="margin-top:16px"></div>
 </main>
@@ -412,7 +421,7 @@ function load(keep){api('/api/admin').then(function(r){if(!r.ok){if(r.locked)ret
  D=r;PB=r.pricebook||[];QS={};(r.quotes||[]).forEach(function(q){QS[q.project_id]=q});$('gate').hidden=true;$('aBody').hidden=false;cur=keep||cur;var y=window.scrollY;render();var pb=$('pbBox');pb.innerHTML='';pb.appendChild(pbEditor());window.scrollTo(0,y)})}
 $('bLock').onclick=function(){api('/api/adminpw/lock',{}).then(function(){location.reload()})};
 $('find').oninput=render;
-$('fAdd').onsubmit=function(e){e.preventDefault();api('/api/admin/project',{email:$('aEm').value,title:$('aTi').value,kind:$('aKi').value,status:$('aSt').value,details:$('aDe').value}).then(function(r){var m=$('addMsg');m.hidden=false;m.className='msg '+(r.ok?'good':'bad');m.textContent=r.ok?'Added.':r.error;if(r.ok){cur=$('aEm').value.toLowerCase().trim();$('fAdd').reset();$('aSt').value='Scheduled';load(cur)}})};
+$('fAdd').onsubmit=function(e){e.preventDefault();var em=$('aEm').value,ms=$('aMs').value.trim();api('/api/admin/project',{email:em,title:$('aTi').value,kind:$('aKi').value,status:$('aSt').value,details:$('aDe').value}).then(function(r){if(r.ok&&ms){api('/api/admin/message',{email:em,projectId:r.id,body:ms});$('aMs').value=''}var m=$('addMsg');m.hidden=false;m.className='msg '+(r.ok?'good':'bad');m.textContent=r.ok?'Added.':r.error;if(r.ok){cur=$('aEm').value.toLowerCase().trim();$('fAdd').reset();$('aSt').value='Scheduled';load(cur)}})};
 load();
 })();
 </script>
