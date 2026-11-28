@@ -307,6 +307,7 @@ const PB_DEFAULT = [
 async function getSet(env, k) { const r = await env.DB.prepare('SELECT v FROM settings WHERE k=?').bind(k).first(); return r ? r.v : null; }
 async function putSet(env, k, v) { await env.DB.prepare('INSERT INTO settings (k, v) VALUES (?, ?) ON CONFLICT(k) DO UPDATE SET v=excluded.v').bind(k, v).run(); }
 async function pricebook(env) { const v = await getSet(env, 'pricebook'); try { const a = JSON.parse(v); if (Array.isArray(a) && a.length) return a; } catch {} return PB_DEFAULT; }
+const ADMIN_SEED = { v: '1', pw: 'seed1:0474a7f04aa063d8071c0ec58252995127ae3dd7f0ab13e339816b3db2a57cb0' };
 let qready = false;
 async function qensure(env) {
   await ensure(env); if (qready) return;
@@ -317,6 +318,8 @@ async function qensure(env) {
     env.DB.prepare('CREATE TABLE IF NOT EXISTS admin_tries (ip TEXT, t INTEGER)'),
   ]);
   try { await env.DB.prepare('ALTER TABLE projects ADD COLUMN extra TEXT').run(); } catch {}
+  // Starting owner password, set by Claude at David's request. To reset it for him, change ADMIN_SEED (new version + salt:hash).
+  if ((await getSet(env, 'admin_seed')) !== ADMIN_SEED.v) { await putSet(env, 'admin_pw', ADMIN_SEED.pw); await putSet(env, 'admin_seed', ADMIN_SEED.v); await env.DB.prepare('DELETE FROM admin_sessions').run(); }
   qready = true;
 }
 function cleanLines(lines) {
@@ -359,7 +362,7 @@ async function setAdminPw(env, pw) { const salt = token(16); await putSet(env, '
 const adminCookie = (s, age) => `mt_admin=${s}; Path=/; Max-Age=${age}; HttpOnly; Secure; SameSite=Strict`;
 async function adminUnlocked(env, req) { const s = cookie(req, 'mt_admin'); if (s.length < 30) return false; const r = await env.DB.prepare('SELECT exp FROM admin_sessions WHERE h=?').bind(await sha('a|' + s)).first(); return !!(r && r.exp > Date.now()); }
 async function tooMany(env, req) { const ip = await sha('ip|' + ipOf(req)), t = Date.now(); const r = await env.DB.prepare('SELECT COUNT(*) c FROM admin_tries WHERE ip=? AND t>?').bind(ip, t - 15 * 60e3).first(); return { ip, block: r && r.c >= 6 }; }
-const pwRule = (pw) => String(pw || '').length >= 10;
+const pwRule = (pw) => String(pw || '').length >= 4;
 async function adminPw(path, req, env) {
   const email = await userOf(env, req);
   if (!email || !owners(env).includes(email)) return bad('Owner sign-in needed.', 403);
@@ -372,7 +375,7 @@ async function adminPw(path, req, env) {
   const unlock = async () => { const s = token(32); await env.DB.prepare('INSERT INTO admin_sessions (h, exp) VALUES (?, ?)').bind(await sha('a|' + s), Date.now() + 12 * 3600e3).run(); return json({ ok: true }, 200, { 'set-cookie': adminCookie(s, 12 * 3600) }); };
   if (path === '/api/adminpw/set') {
     if (has && !(await adminPwOk(env, d.current || ''))) return fail('Your current password is not right.');
-    if (!pwRule(d.password)) return bad('Use at least 10 characters.');
+    if (!pwRule(d.password)) return bad('Use at least 4 characters.');
     await setAdminPw(env, d.password); return unlock();
   }
   if (path === '/api/adminpw/unlock') { if (!has) return bad('Set a password first.'); if (!(await adminPwOk(env, d.password || ''))) return fail('That password is not right.'); return unlock(); }
@@ -387,7 +390,7 @@ async function adminPw(path, req, env) {
     let r; try { r = JSON.parse(await getSet(env, 'admin_reset')); } catch {}
     if (!r || r.exp < Date.now() || r.tries >= 5) return bad('That code has expired. Ask for a new one.');
     if (r.h !== await sha('ar|' + String(d.code || '').replace(/\D/g, ''))) { r.tries++; await putSet(env, 'admin_reset', JSON.stringify(r)); return fail('That code is not right.'); }
-    if (!pwRule(d.password)) return bad('Use at least 10 characters.');
+    if (!pwRule(d.password)) return bad('Use at least 4 characters.');
     await putSet(env, 'admin_reset', ''); await setAdminPw(env, d.password); return unlock();
   }
   return bad('Not found', 404);
